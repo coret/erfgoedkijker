@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: erfgoedkijker
+  labels:
+    app: erfgoedkijker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: erfgoedkijker
+  template:
+    metadata:
+      labels:
+        app: erfgoedkijker
+    spec:
+      containers:
+        - name: erfgoedkijker
+          image: erfgoedkijker:latest # vervang door je registry-image, bv. ghcr.io/<org>/erfgoedkijker:<tag>
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1001
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]

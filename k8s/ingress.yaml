@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: erfgoedkijker
+  labels:
+    app: erfgoedkijker
+  annotations:
+    # Pas aan op je ingress-controller (voorbeeld: ingress-nginx + cert-manager).
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: erfgoedkijker.example.org # vervang door je eigen hostnaam
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: erfgoedkijker
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - erfgoedkijker.example.org
+      secretName: erfgoedkijker-tls
