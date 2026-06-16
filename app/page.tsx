@@ -61,17 +61,8 @@ export default function Page() {
         <h1 className="text-3xl font-bold tracking-tight text-nde-ink">
           ErfgoedKijker
         </h1>
-        <p className="max-w-2xl text-nde-muted">
-          Bekijk hoe een erfgoedobject als linked data wordt aangeboden volgens{' '}
-          <a
-            className="text-nde-blue hover:underline"
-            href="https://docs.nde.nl/schema-profile/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            SCHEMA-AP-NDE
-          </a>
-          . Plak een permalink van een object en klik op <em>Bekijken</em>.
+        <p className="text-nde-muted [text-wrap:balance]">
+          Bekijk hoe een erfgoedobject, via linked data op basis van een erfgoedbrede standaard, eruit ziet. Plak een (perma)link van een erfgoedobject en klik op de <strong>Bekijken</strong> knop of klik op één van de voorbeelden.
         </p>
 
         <form
@@ -132,8 +123,8 @@ export default function Page() {
 
 function Results({ data }: { data: ObjectResponse }) {
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_20rem]">
-      <div className="space-y-5 lg:order-1">
+    <div className="space-y-6">
+      <div className="space-y-5">
         {data.fatal ? (
           <Guidance code={data.fatal} />
         ) : data.object ? (
@@ -146,9 +137,10 @@ function Results({ data }: { data: ObjectResponse }) {
         ))}
       </div>
 
-      <aside className="space-y-4 lg:order-2">
+      {/* Controles full-width at the bottom, before the footer */}
+      <section className="space-y-4">
         <Diagnostics diag={data.diagnostics} />
-      </aside>
+      </section>
     </div>
   );
 }

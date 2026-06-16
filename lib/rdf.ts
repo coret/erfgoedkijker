@@ -1,5 +1,6 @@
 import rdfParse from 'rdf-parse';
 import { Readable } from 'node:stream';
+import { decodeHTML } from 'entities';
 import { Store, DataFactory } from 'n3';
 import type * as RDF from '@rdfjs/types';
 import {
@@ -168,11 +169,21 @@ function recognizedTypes(store: Store, subject: RDF.Term): string[] {
     .filter((x): x is string => x !== null);
 }
 
+/**
+ * Decode HTML/XML character entities embedded in plain-text literals. Some
+ * heritage publishers store values like `digitale foto&#39;s` or `&#234;` (and
+ * named forms such as `&amp;`) in their RDF; without decoding these would render
+ * literally. Only runs when an entity is actually present.
+ */
+function decodeText(value: string): string {
+  return value.includes('&') ? decodeHTML(value) : value;
+}
+
 function langLiterals(terms: RDF.Term[]): LangLiteral[] {
   return terms
     .filter((t) => t.termType === 'Literal')
     .map((t) => ({
-      value: t.value,
+      value: decodeText(t.value),
       lang: (t as RDF.Literal).language || undefined,
     }));
 }
@@ -251,7 +262,7 @@ function mapValue(ctx: Ctx, term: RDF.Term, depth: number): ValueNode | null {
     if (dt && DATE_DATATYPES.has(dt)) return { kind: 'date', value: term.value };
     return {
       kind: 'literal',
-      value: { value: term.value, lang: (term as RDF.Literal).language || undefined },
+      value: { value: decodeText(term.value), lang: (term as RDF.Literal).language || undefined },
     };
   }
 

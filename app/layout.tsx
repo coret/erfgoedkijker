@@ -32,14 +32,6 @@ export default function RootLayout({
                 ErfgoedKijker
               </span>
             </a>
-            <a
-              href="https://docs.nde.nl/schema-profile/"
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm font-medium text-nde-blue hover:underline"
-            >
-              SCHEMA-AP-NDE ↗
-            </a>
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-5 py-8">{children}</main>
@@ -53,7 +45,7 @@ export default function RootLayout({
           >
             SCHEMA-AP-NDE
           </a>
-          . Termen via het{' '}
+          · termen via het{' '}
           <a
             className="text-nde-blue hover:underline"
             href="https://docs.nde.nl/services/network-of-terms/"

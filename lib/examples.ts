@@ -31,9 +31,9 @@ export const EXAMPLES: Example[] = [
     url: 'https://data.bibliotheken.nl/id/nbt/p266055184',
     note: 'Koninklijke Bibliotheek — schema:Book/CreativeWork als JSON-LD. Gebruikt schema:author (buiten het profiel) en heeft geen IIIF/termen.',
   },
-  {
-    label: 'Niet-conform (Linked Art)',
-    url: 'https://id.rijksmuseum.nl/200107615',
-    note: 'Rijksmuseum levert wél linked data, maar als Linked Art (CIDOC-CRM), niet als SCHEMA-AP-NDE — toont de begeleiding bij niet-herkende data.',
-  },
+//  {
+//    label: 'Niet-conform (Linked Art)',
+//    url: 'https://id.rijksmuseum.nl/200107615',
+//    note: 'Rijksmuseum levert wél linked data, maar als Linked Art (CIDOC-CRM), niet als SCHEMA-AP-NDE — toont de begeleiding bij niet-herkende data.',
+//  },
 ];
