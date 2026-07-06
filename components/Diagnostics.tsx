@@ -20,10 +20,16 @@ export function Diagnostics({ diag }: { diag: Diag }) {
 
   return (
     <section className="rounded-2xl border border-nde-line bg-white p-5">
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-nde-muted">
-        Controles
-      </h2>
-      <dl className="space-y-3 text-sm">
+      <details className="group">
+        <summary className="flex cursor-pointer list-none items-center justify-between [&::-webkit-details-marker]:hidden">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-nde-muted">
+            Controles
+          </h2>
+          <span className="text-nde-muted transition-transform group-open:rotate-90">
+            ▸
+          </span>
+        </summary>
+        <dl className="mt-3 space-y-3 text-sm">
         <div className="flex items-center justify-between gap-3">
           <dt className="text-nde-ink">Beschikbaar als linked data</dt>
           <dd>
@@ -77,7 +83,8 @@ export function Diagnostics({ diag }: { diag: Diag }) {
             </div>
           )}
         </div>
-      </dl>
+        </dl>
+      </details>
     </section>
   );
 }
