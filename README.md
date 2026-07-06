@@ -15,7 +15,10 @@ Plak een **permalink** van een erfgoedobject, klik **Bekijken**, en de ErfgoedKi
    **Nederlandse labels**;
 4. toont `DefinedTerm`-waarden met taal (nl/en) en, als er een `sameAs`-URI is, als
    klikbare link die de term opzoekt via het **[NDE Termennetwerk]**;
-5. toont een **IIIF Presentation-manifest** in de [Tify] IIIF-viewer als dat aanwezig is.
+5. toont een **IIIF Presentation-manifest** in de [Tify] IIIF-viewer als dat aanwezig is;
+6. resolvet de **`isPartOf` datasetbeschrijving** en toont titel, beschrijving en uitgever
+   als datasetkaart, met een deeplink naar het **[NDE Dataset Register]** en een controle
+   of de dataset-URI zelf linked data oplevert.
 
 Gaat er iets mis — de URL resolvet niet, biedt geen linked data, is niet conform
 SCHEMA-AP-NDE, heeft geen IIIF-manifest of geen termen — dan toont de tool geen kale
@@ -26,6 +29,7 @@ naar de relevante NDE-documentatie. Wat wél beschikbaar is, wordt altijd getoon
 [Comunica]: https://comunica.dev/
 [SCHEMA-AP-NDE]: https://docs.nde.nl/schema-profile/
 [NDE Termennetwerk]: https://docs.nde.nl/services/network-of-terms/graphql
+[NDE Dataset Register]: https://datasetregister.netwerkdigitaalerfgoed.nl/
 [Tify]: https://github.com/tify-iiif-viewer/tify
 
 ## Requirements
@@ -149,5 +153,6 @@ PLAN.md                 Ontwerp / plan
 
 - SCHEMA-AP-NDE profiel: <https://docs.nde.nl/schema-profile/>
 - NDE Termennetwerk (GraphQL): <https://docs.nde.nl/services/network-of-terms/graphql>
+- NDE Dataset Register: <https://datasetregister.netwerkdigitaalerfgoed.nl/>
 - Tify IIIF-viewer: <https://github.com/tify-iiif-viewer/tify>
 - NDE documentatie: <https://docs.nde.nl/>
