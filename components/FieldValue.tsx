@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { ValueNode, LangLiteral, DefinedTermValue } from '@/lib/types';
+import type { ValueNode, LangLiteral, DefinedTermValue, DatasetInfo } from '@/lib/types';
 import { TermPanel } from './TermPanel';
 
 function LangBadge({ lang }: { lang?: string }) {
@@ -50,6 +50,60 @@ function TermValue({ term }: { term: DefinedTermValue }) {
   );
 }
 
+function DatasetValue({ dataset }: { dataset: DatasetInfo }) {
+  const title = dataset.name ? pickLiteral(dataset.name) : undefined;
+  const description = dataset.description ? pickLiteral(dataset.description) : undefined;
+  const publisher = dataset.publisher ? pickLiteral(dataset.publisher) : undefined;
+
+  return (
+    <div className="rounded-xl border border-nde-line bg-nde-bg/60 p-3">
+      <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-nde-muted">
+        Dataset
+      </div>
+      {title && (
+        <div className="font-semibold text-nde-ink">
+          {title.value}
+          <LangBadge lang={title.lang} />
+        </div>
+      )}
+      {description && (
+        <p className="mt-1 whitespace-pre-wrap text-sm text-nde-ink">
+          {description.value}
+          <LangBadge lang={description.lang} />
+        </p>
+      )}
+      {publisher && (
+        <div className="mt-1 text-sm text-nde-muted">
+          Uitgever: <span className="text-nde-ink">{publisher.value}</span>
+        </div>
+      )}
+      {!dataset.resolved && (
+        <p className="mt-1 text-xs text-nde-orange-dark">
+          ⚠ Deze dataset-URI leverde geen linked data op.
+        </p>
+      )}
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+        <a
+          href={dataset.uri}
+          target="_blank"
+          rel="noreferrer"
+          className="break-all text-nde-muted hover:text-nde-blue hover:underline"
+        >
+          {dataset.uri}
+        </a>
+        <a
+          href={dataset.registerUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="whitespace-nowrap text-nde-blue hover:underline"
+        >
+          Bekijk in NDE Dataset Register ↗
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export function FieldValue({ value }: { value: ValueNode }) {
   switch (value.kind) {
     case 'literal':
@@ -74,6 +128,8 @@ export function FieldValue({ value }: { value: ValueNode }) {
       );
     case 'term':
       return <TermValue term={value.term} />;
+    case 'dataset':
+      return <DatasetValue dataset={value.dataset} />;
     case 'geo':
       return (
         <a

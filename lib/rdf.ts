@@ -22,6 +22,7 @@ import type {
   Field,
   ValueNode,
   LangLiteral,
+  DatasetInfo,
 } from './types';
 
 const { namedNode } = DataFactory;
@@ -215,6 +216,22 @@ function pickMainSubject(
     [...types].find((t) => CREATIVEWORK_SUBTYPES.has(t)) ??
     [...types].find((t) => TOP_LEVEL_TYPES.has(t));
 
+  // Richness = number of outgoing triples. Used to break ties between multiple
+  // qualifying subjects: the actual heritage object is described in full, while
+  // referenced stubs (e.g. an `isPartOf` Dataset) carry only @id + @type.
+  const richness = (subject: RDF.Term) =>
+    store.getQuads(subject as RDF.Quad_Subject, null, null, null).length;
+
+  const richestWhere = (pred: (types: Set<string>) => boolean) => {
+    let best: { subject: RDF.Term; types: Set<string>; r: number } | null = null;
+    for (const { subject, types } of bySubject.values()) {
+      if (!pred(types)) continue;
+      const r = richness(subject);
+      if (!best || r > best.r) best = { subject, types, r };
+    }
+    return best;
+  };
+
   // 1. subject matching the requested URL with a recognized main type
   for (const [uri, { subject, types }] of bySubject) {
     if (urlCandidates.has(uri)) {
@@ -222,15 +239,14 @@ function pickMainSubject(
       if (t) return { subject, type: CREATIVEWORK_SUBTYPES.has(t) ? 'CreativeWork' : t };
     }
   }
-  // 2. any CreativeWork(-subtype)
-  for (const { subject, types } of bySubject.values()) {
-    const t = [...types].find((x) => CREATIVEWORK_SUBTYPES.has(x));
-    if (t) return { subject, type: 'CreativeWork' };
-  }
-  // 3. any top-level Person/Organization/Place
-  for (const { subject, types } of bySubject.values()) {
-    const t = [...types].find((x) => TOP_LEVEL_TYPES.has(x));
-    if (t) return { subject, type: t };
+  // 2. the richest CreativeWork(-subtype) subject (most descriptive properties)
+  const cw = richestWhere((types) => [...types].some((x) => CREATIVEWORK_SUBTYPES.has(x)));
+  if (cw) return { subject: cw.subject, type: 'CreativeWork' };
+  // 3. the richest top-level Person/Organization/Place
+  const top = richestWhere((types) => [...types].some((x) => TOP_LEVEL_TYPES.has(x)));
+  if (top) {
+    const t = [...top.types].find((x) => TOP_LEVEL_TYPES.has(x))!;
+    return { subject: top.subject, type: t };
   }
   return null;
 }
@@ -364,6 +380,8 @@ function mapResource(
 export type ExtractResult = {
   object: ObjectView | null;
   foundCreativeWork: boolean;
+  /** The isPartOf dataset-description URI, if the object declares one (not fetched here). */
+  datasetUri?: string;
 };
 
 /** Build the ErfgoedKijker view-model from a parsed store. */
@@ -401,5 +419,66 @@ export function extractObject(
     iiifManifestUrl,
     termCount: ctx.termCount.n,
   };
-  return { object, foundCreativeWork: main.type === 'CreativeWork' };
+  const datasetUri = firstIri(objectsFor(store, main.subject, 'isPartOf'));
+  return { object, foundCreativeWork: main.type === 'CreativeWork', datasetUri };
+}
+
+/** Build the NDE Dataset Register deep link for a dataset-description URI. */
+function datasetRegisterUrl(uri: string): string {
+  return (
+    'https://datasetregister.netwerkdigitaalerfgoed.nl/dataset?uri=' +
+    encodeURIComponent(uri)
+  );
+}
+
+/** Pick the schema:Dataset subject, preferring one whose IRI matches the URL. */
+function pickDatasetSubject(
+  store: Store,
+  finalUrl: string,
+  uri: string,
+): RDF.Term | null {
+  const datasets = store
+    .getQuads(null, namedNode(RDF_TYPE), null, null)
+    .filter((q) => schemaLocal(q.object.value) === 'Dataset')
+    .map((q) => q.subject as RDF.Term);
+  if (!datasets.length) return null;
+  const wanted = new Set([finalUrl, uri, finalUrl.replace(/\/$/, ''), uri.replace(/\/$/, '')]);
+  return datasets.find((s) => wanted.has(s.value)) ?? datasets[0];
+}
+
+/** Publisher display name(s): a nested resource's name, or a literal, else undefined. */
+function datasetPublisher(store: Store, subject: RDF.Term): LangLiteral[] | undefined {
+  const pub = objectsFor(store, subject, 'publisher')[0];
+  if (!pub) return undefined;
+  if (pub.termType === 'Literal') return [{ value: decodeText(pub.value) }];
+  const names = langLiterals(objectsFor(store, pub, 'name'));
+  return names.length ? names : undefined;
+}
+
+/**
+ * Resolve an isPartOf dataset-description URI to its title/description/publisher.
+ * Always returns a DatasetInfo (with the register link); `resolved` is false when
+ * the URI does not yield linked data.
+ */
+export async function resolveDataset(uri: string): Promise<DatasetInfo> {
+  const registerUrl = datasetRegisterUrl(uri);
+  try {
+    const { store, finalUrl } = await fetchLinkedData(uri);
+    const subject = pickDatasetSubject(store, finalUrl, uri);
+    if (!subject) return { uri, resolved: true, registerUrl };
+    const name = langLiterals(objectsFor(store, subject, 'name'));
+    const description = langLiterals(objectsFor(store, subject, 'description'));
+    const publisher = datasetPublisher(store, subject);
+    return {
+      uri,
+      resolved: true,
+      name: name.length ? name : undefined,
+      description: description.length ? description : undefined,
+      publisher,
+      registerUrl,
+    };
+  } catch {
+    // URL_UNRESOLVED or NO_LINKED_DATA → only the URI + register link are available.
+    return { uri, resolved: false, registerUrl };
+  }
 }

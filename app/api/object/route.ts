@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchLinkedData, extractObject, FetchError } from '@/lib/rdf';
+import { fetchLinkedData, extractObject, resolveDataset, FetchError } from '@/lib/rdf';
 import { buildPersistentId, detectScheme } from '@/lib/persistent-id';
-import type { ObjectResponse, GuidanceCode } from '@/lib/types';
+import type { ObjectResponse, GuidanceCode, ValueNode } from '@/lib/types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -41,11 +41,29 @@ export async function POST(req: NextRequest) {
     tripleCount: 0,
     foundCreativeWork: false,
     persistentId: { scheme: detectScheme(url), ok: null as boolean | null },
+    datasetResolves: null as boolean | null,
   };
 
   try {
     const { store, finalUrl, mediaType, tripleCount } = await fetchLinkedData(url);
-    const { object, foundCreativeWork } = extractObject(store, finalUrl, url);
+    const { object, foundCreativeWork, datasetUri } = extractObject(store, finalUrl, url);
+
+    // Resolve the isPartOf dataset-description URI (title/description/publisher) and
+    // render it inline under the existing "Onderdeel van dataset" field.
+    let datasetResolves: boolean | null = null;
+    if (object && datasetUri) {
+      const dataset = await resolveDataset(datasetUri);
+      datasetResolves = dataset.resolved;
+      const node: ValueNode = { kind: 'dataset', dataset };
+      const field = object.fields.find((f) => f.property === 'isPartOf');
+      if (field) field.values = [node];
+      else
+        object.fields.push({
+          property: 'isPartOf',
+          labelNl: 'Onderdeel van dataset',
+          values: [node],
+        });
+    }
 
     const notices: GuidanceCode[] = [];
     if (!object) notices.push('NOT_SCHEMA_AP_NDE');
@@ -66,6 +84,7 @@ export async function POST(req: NextRequest) {
         tripleCount,
         foundCreativeWork,
         persistentId: buildPersistentId(url, finalUrl, true),
+        datasetResolves,
       },
     };
     return NextResponse.json(response);

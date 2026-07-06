@@ -53,6 +53,17 @@ export function Diagnostics({ diag }: { diag: Diag }) {
           </dd>
         </div>
 
+        {diag.datasetResolves !== null && (
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-nde-ink">Dataset-URI resolvet</dt>
+            <dd>
+              <Badge ok={diag.datasetResolves}>
+                {diag.datasetResolves ? 'Ja' : 'Nee'}
+              </Badge>
+            </dd>
+          </div>
+        )}
+
         <div className="mt-3 space-y-1 border-t border-nde-line pt-3 text-xs text-nde-muted">
           {diag.detectedFormat && (
             <div>

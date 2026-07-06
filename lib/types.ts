@@ -18,6 +18,19 @@ export type MediaValue = {
   copyrightNotice?: LangLiteral[];
 };
 
+export type DatasetInfo = {
+  /** The isPartOf dataset-description URI (also used for the register link). */
+  uri: string;
+  /** Did the URI resolve to linked data (RDF)? */
+  resolved: boolean;
+  name?: LangLiteral[];
+  description?: LangLiteral[];
+  /** Publisher display name(s). */
+  publisher?: LangLiteral[];
+  /** Deep link into the NDE Dataset Register. */
+  registerUrl: string;
+};
+
 export type ValueNode =
   | { kind: 'literal'; value: LangLiteral }
   | { kind: 'date'; value: string }
@@ -26,6 +39,7 @@ export type ValueNode =
   | { kind: 'resource'; resource: MappedResource }
   | { kind: 'geo'; lat: number; long: number }
   | { kind: 'media'; media: MediaValue }
+  | { kind: 'dataset'; dataset: DatasetInfo }
   | { kind: 'iiif'; manifestUrl: string };
 
 export type Field = {
@@ -79,6 +93,8 @@ export type Diagnostics = {
   tripleCount: number;
   foundCreativeWork: boolean;
   persistentId: PersistentId;
+  /** Did the isPartOf dataset-description URI resolve to RDF? null = not present/checked. */
+  datasetResolves: boolean | null;
 };
 
 export type ObjectResponse = {
