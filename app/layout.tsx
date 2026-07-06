@@ -36,7 +36,16 @@ export default function RootLayout({
         </header>
         <main className="mx-auto max-w-5xl px-5 py-8">{children}</main>
         <footer className="mx-auto max-w-5xl px-5 py-10 text-xs text-nde-muted">
-          Prototype · toont uitsluitend velden die het herkent volgens{' '}
+          Prototype (source:{' '}
+          <a
+            className="text-nde-blue hover:underline"
+            href="https://github.com/coret/erfgoedkijker"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Github
+          </a>
+          ) · toont uitsluitend velden die het herkent volgens{' '}
           <a
             className="text-nde-blue hover:underline"
             href="https://docs.nde.nl/schema-profile/"
