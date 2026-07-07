@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { ObjectResponse } from '@/lib/types';
 import { EXAMPLES } from '@/lib/examples';
 import { ObjectView } from '@/components/ObjectView';
+import { ObjectSkeleton } from '@/components/ObjectSkeleton';
 import { Diagnostics } from '@/components/Diagnostics';
 import { Guidance } from '@/components/Guidance';
 
@@ -113,6 +114,8 @@ export default function Page() {
           {error}
         </div>
       )}
+
+      {loading && <ObjectSkeleton />}
 
       {data && (
         <Results data={data} />

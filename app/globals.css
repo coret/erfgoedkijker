@@ -21,3 +21,33 @@ body {
   height: 100%;
   width: 100%;
 }
+
+/* Skeleton-loader: grijs blok met een shimmer-gradient die eroverheen veegt. */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton {
+  @apply relative overflow-hidden rounded bg-nde-line/70;
+}
+.skeleton::after {
+  content: '';
+  @apply absolute inset-0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+/* Geen beweging bij prefers-reduced-motion (blok blijft statisch grijs). */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
