@@ -15,7 +15,7 @@ export function schemaLocal(iri: string): string | null {
   return null;
 }
 
-export type PropertyDef = { name: string; labelNl: string };
+export type PropertyDef = { name: string; labelNl: string; required?: boolean };
 
 export type ClassDef = {
   /** schema.org local name */
@@ -52,25 +52,26 @@ export const PROFILE: Record<string, ClassDef> = {
   CreativeWork: {
     type: 'CreativeWork',
     labelNl: 'Erfgoedobject',
+    // Order and required flags follow SCHEMA-AP-NDE (https://docs.nde.nl/schema-profile/).
     properties: [
-      { name: 'name', labelNl: 'Titel' },
+      { name: 'identifier', labelNl: 'Identificatie' },
+      { name: 'name', labelNl: 'Titel', required: true },
+      { name: 'description', labelNl: 'Beschrijving' },
       { name: 'additionalType', labelNl: 'Objecttype' },
       { name: 'creator', labelNl: 'Maker' },
-      { name: 'dateCreated', labelNl: 'Datering' },
-      { name: 'locationCreated', labelNl: 'Vervaardigingsplaats' },
-      { name: 'material', labelNl: 'Materiaal' },
-      { name: 'genre', labelNl: 'Genre' },
-      { name: 'size', labelNl: 'Afmetingen' },
       { name: 'abstract', labelNl: 'Samenvatting' },
-      { name: 'description', labelNl: 'Beschrijving' },
       { name: 'text', labelNl: 'Tekst' },
-      { name: 'about', labelNl: 'Onderwerp' },
+      { name: 'size', labelNl: 'Afmetingen' },
       { name: 'contentLocation', labelNl: 'Afgebeelde locatie' },
       { name: 'temporalCoverage', labelNl: 'Periode' },
-      { name: 'identifier', labelNl: 'Identificatie' },
-      { name: 'isPartOf', labelNl: 'Onderdeel van dataset' },
+      { name: 'about', labelNl: 'Onderwerp' },
+      { name: 'locationCreated', labelNl: 'Vervaardigingsplaats' },
+      { name: 'dateCreated', labelNl: 'Datering' },
+      { name: 'material', labelNl: 'Materiaal' },
+      { name: 'genre', labelNl: 'Genre' },
       { name: 'associatedMedia', labelNl: 'Media' },
-      { name: 'sdDatePublished', labelNl: 'Metadata laatst gewijzigd' },
+      { name: 'sdDatePublished', labelNl: 'Metadata laatst gewijzigd', required: true },
+      { name: 'isPartOf', labelNl: 'Onderdeel van dataset' },
     ],
   },
   Person: {
