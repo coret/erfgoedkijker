@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: 'NDE ErfgoedKijker',
   description:
     'Bekijk een erfgoedobject als linked data volgens SCHEMA-AP-NDE. Een prototype van het Netwerk Digitaal Erfgoed.',
+  icons: {
+    icon: '/nde-logo.svg',
+  },
 };
 
 export default function RootLayout({
