@@ -43,13 +43,30 @@ export function Diagnostics({ diag }: { diag: Diag }) {
   const linkedDataOk = diag.tripleCount > 0;
   const pid = diag.persistentId;
 
+  // Number of "orange" (ok===false) checks below; grey/null checks don't count.
+  const orangeCount =
+    (linkedDataOk ? 0 : 1) +
+    (diag.foundCreativeWork ? 0 : 1) +
+    (diag.schemaOrg !== null && diag.schemaOrg !== 'https' ? 1 : 0) +
+    (pid.scheme !== null && pid.ok === false ? 1 : 0) +
+    (diag.missingLanguageTags !== null && diag.missingLanguageTags > 0 ? 1 : 0) +
+    (diag.licenseCheck && !diag.licenseCheck.match ? 1 : 0) +
+    (diag.datasetResolves === false ? 1 : 0);
+
   return (
     <section className="rounded-2xl border border-nde-line bg-white p-5">
       <details className="group">
         <summary className="flex cursor-pointer list-none items-center justify-between [&::-webkit-details-marker]:hidden">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-nde-muted">
-            Controles
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-nde-muted">
+              Controles
+            </h2>
+            {orangeCount > 0 && (
+              <span className="rounded-full bg-nde-orange/15 px-2 py-0.5 text-xs font-semibold text-nde-orange-dark">
+                {orangeCount}
+              </span>
+            )}
+          </div>
           <span className="text-nde-muted transition-transform group-open:rotate-90">
             ▸
           </span>
