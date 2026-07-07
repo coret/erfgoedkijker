@@ -5,9 +5,11 @@ import {
   resolveDataset,
   serializeTurtle,
   detectSchemaOrgVariant,
+  collectMediaLicenses,
   FetchError,
 } from '@/lib/rdf';
-import type { SchemaOrgVariant } from '@/lib/types';
+import { fetchManifestLicense } from '@/lib/iiif';
+import type { SchemaOrgVariant, LicenseCheck } from '@/lib/types';
 import { buildPersistentId, detectScheme } from '@/lib/persistent-id';
 import type { ObjectResponse, GuidanceCode, ValueNode } from '@/lib/types';
 
@@ -52,6 +54,7 @@ export async function POST(req: NextRequest) {
     datasetResolves: null as boolean | null,
     turtle: null as string | null,
     schemaOrg: null as SchemaOrgVariant | null,
+    licenseCheck: null as LicenseCheck | null,
   };
 
   try {
@@ -77,6 +80,24 @@ export async function POST(req: NextRequest) {
         });
     }
 
+    // Compare the media license against the IIIF manifest's declared rights/license.
+    let licenseCheck: LicenseCheck | null = null;
+    if (object?.iiifManifestUrl) {
+      const mediaLicenses = collectMediaLicenses(object);
+      if (mediaLicenses.length) {
+        const manifestLicense = await fetchManifestLicense(object.iiifManifestUrl);
+        if (manifestLicense) {
+          const norm = (s: string) => s.replace(/\/+$/, '').toLowerCase();
+          const hit = mediaLicenses.find((l) => norm(l) === norm(manifestLicense));
+          licenseCheck = {
+            match: Boolean(hit),
+            media: hit ?? mediaLicenses[0],
+            manifest: manifestLicense,
+          };
+        }
+      }
+    }
+
     const notices: GuidanceCode[] = [];
     if (!object) notices.push('NOT_SCHEMA_AP_NDE');
     if (object && !object.iiifManifestUrl) notices.push('NO_IIIF');
@@ -99,6 +120,7 @@ export async function POST(req: NextRequest) {
         datasetResolves,
         turtle,
         schemaOrg,
+        licenseCheck,
       },
     };
     return NextResponse.json(response);

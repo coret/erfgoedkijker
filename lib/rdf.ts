@@ -510,6 +510,20 @@ export function extractObject(
   return { object, foundCreativeWork: main.type === 'CreativeWork', datasetUri };
 }
 
+/** Collect the unique, non-empty media licenses (`schema:license`) from a view-model. */
+export function collectMediaLicenses(object: ObjectView): string[] {
+  const licenses = new Set<string>();
+  const scan = (fields: Field[]) => {
+    for (const f of fields)
+      for (const v of f.values) {
+        if (v.kind === 'media' && v.media.license) licenses.add(v.media.license);
+        if (v.kind === 'resource') scan(v.resource.fields);
+      }
+  };
+  scan(object.fields);
+  return [...licenses];
+}
+
 /** Build the NDE Dataset Register deep link for a dataset-description URI. */
 function datasetRegisterUrl(uri: string): string {
   return (

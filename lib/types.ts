@@ -6,6 +6,15 @@ export type LangLiteral = { value: string; lang?: string };
 /** Which schema.org namespace a source uses: recommended https, legacy http, or both. */
 export type SchemaOrgVariant = 'https' | 'http' | 'mixed';
 
+/** Comparison of the media's schema:license against the IIIF manifest's rights/license. */
+export type LicenseCheck = {
+  match: boolean;
+  /** The compared schema:license of the media. */
+  media: string;
+  /** The rights/license URI from the IIIF manifest. */
+  manifest: string;
+};
+
 export type DefinedTermValue = {
   /** Language-tagged display name(s) from the publishing dataset. */
   name: LangLiteral[];
@@ -104,6 +113,8 @@ export type Diagnostics = {
   turtle: string | null;
   /** schema.org namespace variant used by the source (https recommended); null = none present. */
   schemaOrg: SchemaOrgVariant | null;
+  /** Does the media license match the IIIF manifest's rights? null = not applicable/undetermined. */
+  licenseCheck: LicenseCheck | null;
 };
 
 export type ObjectResponse = {

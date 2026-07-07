@@ -99,6 +99,17 @@ export function Diagnostics({ diag }: { diag: Diag }) {
           </dd>
         </div>
 
+        {diag.licenseCheck && (
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-nde-ink">Licentie media komt overeen met manifest</dt>
+            <dd>
+              <Badge ok={diag.licenseCheck.match}>
+                {diag.licenseCheck.match ? 'Ja' : 'Nee'}
+              </Badge>
+            </dd>
+          </div>
+        )}
+
         {diag.datasetResolves !== null && (
           <div className="flex items-center justify-between gap-3">
             <dt className="text-nde-ink">Dataset-URI resolvet</dt>
@@ -121,6 +132,16 @@ export function Diagnostics({ diag }: { diag: Diag }) {
             <div className="break-all">
               Resolved naar: <span className="font-mono">{diag.finalUrl}</span>
             </div>
+          )}
+          {diag.licenseCheck && !diag.licenseCheck.match && (
+            <>
+              <div className="break-all">
+                Licentie media: <span className="font-mono">{diag.licenseCheck.media}</span>
+              </div>
+              <div className="break-all">
+                Licentie manifest: <span className="font-mono">{diag.licenseCheck.manifest}</span>
+              </div>
+            </>
           )}
         </div>
 
