@@ -113,7 +113,7 @@ docker rm -f erfgoedkijker    # stoppen + verwijderen
 De image gebruikt de Next.js *standalone* output (kleine runtime-image, draait als
 non-root gebruiker).
 
-## Kubernetes
+## Kubernetes (untested)
 
 Manifests staan in [`k8s/`](./k8s): `Deployment` (2 replica's, liveness/readiness op
 `/api/health`, non-root securityContext), `Service` (ClusterIP) en een voorbeeld-`Ingress`.
