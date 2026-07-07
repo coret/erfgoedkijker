@@ -55,7 +55,7 @@ export default function RootLayout({
             target="_blank"
             rel="noreferrer"
           >
-            SCHEMA-AP-NDE
+            SCHEMA-AP-NDE (versie 1.1.0)
           </a>
           · termen via het{' '}
           <a

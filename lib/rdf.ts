@@ -224,6 +224,51 @@ export function detectSchemaOrgVariant(store: Store): SchemaOrgVariant | null {
   return null;
 }
 
+// Properties that must carry a language tag (rdf:langString) per SCHEMA-AP-NDE, and
+// the classes they apply to. `name` on a bare DefinedTerm is deliberately out of scope.
+const LANG_NAME_CLASSES = new Set<string>([
+  ...CREATIVEWORK_SUBTYPES,
+  'Organization',
+  'Person',
+  'Place',
+]);
+const LANG_REQUIRED_PROPS = new Set(['name', 'description', 'abstract', 'text', 'copyrightNotice']);
+
+/**
+ * Count text values that should carry a language tag but don't: `name`
+ * (CreativeWork/Organization/Person/Place), `description`/`abstract`/`text`
+ * (CreativeWork), and `copyrightNotice` (media). Counts value occurrences.
+ */
+export function countMissingLanguageTags(store: Store): number {
+  const typesBySubject = new Map<string, Set<string>>();
+  for (const q of store.getQuads(null, namedNode(RDF_TYPE), null, null)) {
+    const local = schemaLocal(q.object.value);
+    if (!local) continue;
+    let s = typesBySubject.get(q.subject.value);
+    if (!s) typesBySubject.set(q.subject.value, (s = new Set()));
+    s.add(local);
+  }
+
+  const applies = (prop: string, types: Set<string> | undefined): boolean => {
+    if (!types) return false;
+    const t = [...types];
+    if (prop === 'name') return t.some((x) => LANG_NAME_CLASSES.has(x));
+    if (prop === 'copyrightNotice') return t.some((x) => MEDIA_TYPES.has(x));
+    return t.some((x) => CREATIVEWORK_SUBTYPES.has(x)); // description / abstract / text
+  };
+
+  let count = 0;
+  for (const q of store.getQuads(null, null, null, null)) {
+    const prop = schemaLocal(q.predicate.value);
+    if (!prop || !LANG_REQUIRED_PROPS.has(prop)) continue;
+    if (q.object.termType !== 'Literal') continue;
+    if ((q.object as RDF.Literal).language) continue;
+    if (!applies(prop, typesBySubject.get(q.subject.value))) continue;
+    count += 1;
+  }
+  return count;
+}
+
 /** Serialize a parsed store to pretty-printed Turtle (with prefixes) for display. */
 export function serializeTurtle(store: Store): Promise<string> {
   return new Promise((resolve, reject) => {

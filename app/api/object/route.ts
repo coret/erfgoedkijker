@@ -6,6 +6,7 @@ import {
   serializeTurtle,
   detectSchemaOrgVariant,
   collectMediaLicenses,
+  countMissingLanguageTags,
   FetchError,
 } from '@/lib/rdf';
 import { fetchManifestLicense } from '@/lib/iiif';
@@ -55,6 +56,7 @@ export async function POST(req: NextRequest) {
     turtle: null as string | null,
     schemaOrg: null as SchemaOrgVariant | null,
     licenseCheck: null as LicenseCheck | null,
+    missingLanguageTags: null as number | null,
   };
 
   try {
@@ -62,6 +64,7 @@ export async function POST(req: NextRequest) {
     const { object, foundCreativeWork, datasetUri } = extractObject(store, finalUrl, url);
     const turtle = await serializeTurtle(store);
     const schemaOrg = detectSchemaOrgVariant(store);
+    const missingLanguageTags = countMissingLanguageTags(store);
 
     // Resolve the isPartOf dataset-description URI (title/description/publisher) and
     // render it inline under the existing "Onderdeel van dataset" field.
@@ -121,6 +124,7 @@ export async function POST(req: NextRequest) {
         turtle,
         schemaOrg,
         licenseCheck,
+        missingLanguageTags,
       },
     };
     return NextResponse.json(response);

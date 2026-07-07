@@ -115,6 +115,8 @@ export type Diagnostics = {
   schemaOrg: SchemaOrgVariant | null;
   /** Does the media license match the IIIF manifest's rights? null = not applicable/undetermined. */
   licenseCheck: LicenseCheck | null;
+  /** Count of text values (name/description/abstract/text/copyrightNotice) lacking a language tag; null = not computed. */
+  missingLanguageTags: number | null;
 };
 
 export type ObjectResponse = {

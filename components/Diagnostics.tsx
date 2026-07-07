@@ -99,6 +99,15 @@ export function Diagnostics({ diag }: { diag: Diag }) {
           </dd>
         </div>
 
+        {diag.missingLanguageTags !== null && (
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-nde-ink">Tekstwaarden zonder taaltag</dt>
+            <dd>
+              <Badge ok={diag.missingLanguageTags === 0}>{diag.missingLanguageTags}</Badge>
+            </dd>
+          </div>
+        )}
+
         {diag.licenseCheck && (
           <div className="flex items-center justify-between gap-3">
             <dt className="text-nde-ink">Licentie media komt overeen met manifest</dt>
