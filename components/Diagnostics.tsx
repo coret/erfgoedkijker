@@ -1,4 +1,5 @@
 import type { Diagnostics as Diag } from '@/lib/types';
+import { TurtleView } from './TurtleView';
 
 function Badge({ ok, children }: { ok: boolean | null; children: React.ReactNode }) {
   const cls =
@@ -12,6 +13,30 @@ function Badge({ ok, children }: { ok: boolean | null; children: React.ReactNode
       {children}
     </span>
   );
+}
+
+/** Human-readable name for a source RDF media type (used in the Turtle label). */
+const SOURCE_FORMAT_NAMES: Record<string, string> = {
+  'application/ld+json': 'JSON-LD',
+  'application/json': 'JSON-LD',
+  'application/rdf+xml': 'RDF/XML',
+  'application/xml': 'RDF/XML',
+  'text/xml': 'RDF/XML',
+  'application/n-triples': 'N-Triples',
+  'application/n-quads': 'N-Quads',
+  'application/trig': 'TriG',
+  'text/n3': 'N3',
+};
+
+/**
+ * Label for the raw-Turtle disclosure. The shown Turtle is always serialized from
+ * the parsed graph; when the source itself was not Turtle we say so, so it's clear
+ * this is a normalized rendering rather than the original bytes.
+ */
+function turtleLabel(contentType: string | null): string {
+  const base = (contentType ?? '').split(';')[0].trim().toLowerCase();
+  if (!base || base === 'text/turtle') return 'Rauwe linked data (Turtle)';
+  return `Rauwe linked data (Turtle, bron was ${SOURCE_FORMAT_NAMES[base] ?? base})`;
 }
 
 export function Diagnostics({ diag }: { diag: Diag }) {
@@ -45,6 +70,21 @@ export function Diagnostics({ diag }: { diag: Diag }) {
             </Badge>
           </dd>
         </div>
+
+        {diag.schemaOrg !== null && (
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-nde-ink">schema.org-namespace</dt>
+            <dd>
+              <Badge ok={diag.schemaOrg === 'https'}>
+                {diag.schemaOrg === 'https'
+                  ? 'https'
+                  : diag.schemaOrg === 'http'
+                    ? 'http (afgeraden)'
+                    : 'http + https'}
+              </Badge>
+            </dd>
+          </div>
+        )}
 
         <div className="flex items-center justify-between gap-3">
           <dt className="text-nde-ink">
@@ -83,6 +123,18 @@ export function Diagnostics({ diag }: { diag: Diag }) {
             </div>
           )}
         </div>
+
+        {diag.turtle && (
+          <details className="group/ttl mt-3 border-t border-nde-line pt-3">
+            <summary className="flex cursor-pointer list-none items-center gap-2 text-xs font-semibold uppercase tracking-wide text-nde-blue [&::-webkit-details-marker]:hidden">
+              <span className="transition-transform group-open/ttl:rotate-90">▸</span>
+              {turtleLabel(diag.detectedFormat)}
+            </summary>
+            <div className="mt-2 overflow-x-auto rounded-xl border border-nde-line bg-nde-blue-soft/40 p-3">
+              <TurtleView turtle={diag.turtle} />
+            </div>
+          </details>
+        )}
         </dl>
       </details>
     </section>

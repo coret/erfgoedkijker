@@ -1,7 +1,7 @@
 import rdfParse from 'rdf-parse';
 import { Readable } from 'node:stream';
 import { decodeHTML } from 'entities';
-import { Store, DataFactory } from 'n3';
+import { Store, DataFactory, Writer } from 'n3';
 import type * as RDF from '@rdfjs/types';
 import {
   SCHEMA,
@@ -23,6 +23,7 @@ import type {
   ValueNode,
   LangLiteral,
   DatasetInfo,
+  SchemaOrgVariant,
 } from './types';
 
 const { namedNode } = DataFactory;
@@ -149,6 +150,87 @@ export async function fetchLinkedData(url: string): Promise<FetchResult> {
     mediaType: rawContentType ?? contentType,
     tripleCount,
   };
+}
+
+// ---- Turtle serialization ----------------------------------------------------
+
+/** Well-known RDF namespaces, declared as prefixes only when actually used. */
+const WELL_KNOWN_NS: Array<[string, string]> = [
+  ['rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'],
+  ['rdfs', 'http://www.w3.org/2000/01/rdf-schema#'],
+  ['xsd', 'http://www.w3.org/2001/XMLSchema#'],
+  ['skos', 'http://www.w3.org/2004/02/skos/core#'],
+  ['dcterms', 'http://purl.org/dc/terms/'],
+  ['foaf', 'http://xmlns.com/foaf/0.1/'],
+  ['geo', 'http://www.w3.org/2003/01/geo/wgs84_pos#'],
+  ['xhtml', 'http://www.w3.org/1999/xhtml/vocab#'],
+  ['o', 'http://omeka.org/s/vocabs/o#'],
+];
+
+/** Namespace part of an IRI (everything up to and including the last '#' or '/'). */
+function namespaceOf(iri: string): string {
+  const hash = iri.lastIndexOf('#');
+  if (hash >= 0) return iri.slice(0, hash + 1);
+  const slash = iri.lastIndexOf('/');
+  return slash >= 0 ? iri.slice(0, slash + 1) : iri;
+}
+
+/**
+ * Build the `@prefix` set from the namespaces that actually occur in the store, so
+ * the Turtle uses compact names (e.g. `schema:identifier`) and declares no unused
+ * prefixes. schema.org is bound to `schema:` for whichever variant (http/https) the
+ * data uses; if both occur, the http variant gets a secondary `schemahttp:` prefix.
+ */
+function buildTurtlePrefixes(store: Store): Record<string, string> {
+  const used = new Set<string>();
+  for (const q of store.getQuads(null, null, null, null)) {
+    used.add(namespaceOf(q.predicate.value));
+    if (q.subject.termType === 'NamedNode') used.add(namespaceOf(q.subject.value));
+    if (q.object.termType === 'NamedNode') used.add(namespaceOf(q.object.value));
+    else if (q.object.termType === 'Literal') {
+      const dt = (q.object as RDF.Literal).datatype?.value;
+      if (dt) used.add(namespaceOf(dt));
+    }
+  }
+
+  const prefixes: Record<string, string> = {};
+  const httpsUsed = used.has(SCHEMA); // https://schema.org/
+  const httpUsed = used.has(SCHEMA_HTTP); // http://schema.org/
+  if (httpsUsed) prefixes.schema = SCHEMA;
+  else if (httpUsed) prefixes.schema = SCHEMA_HTTP;
+  if (httpsUsed && httpUsed) prefixes.schemahttp = SCHEMA_HTTP;
+  for (const [p, ns] of WELL_KNOWN_NS) if (used.has(ns)) prefixes[p] = ns;
+  return prefixes;
+}
+
+/**
+ * Detect which schema.org namespace the source uses. SCHEMA-AP-NDE recommends the
+ * https variant; some publishers still emit the legacy http one. Returns null when
+ * no schema.org terms occur (e.g. a non-recognized object).
+ */
+export function detectSchemaOrgVariant(store: Store): SchemaOrgVariant | null {
+  let https = false;
+  let http = false;
+  for (const q of store.getQuads(null, null, null, null)) {
+    for (const term of [q.subject, q.predicate, q.object]) {
+      if (term.termType !== 'NamedNode') continue;
+      if (term.value.startsWith(SCHEMA)) https = true;
+      else if (term.value.startsWith(SCHEMA_HTTP)) http = true;
+    }
+  }
+  if (https && http) return 'mixed';
+  if (https) return 'https';
+  if (http) return 'http';
+  return null;
+}
+
+/** Serialize a parsed store to pretty-printed Turtle (with prefixes) for display. */
+export function serializeTurtle(store: Store): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const writer = new Writer({ prefixes: buildTurtlePrefixes(store) });
+    writer.addQuads(store.getQuads(null, null, null, null));
+    writer.end((err, result) => (err ? reject(err) : resolve(result)));
+  });
 }
 
 // ---- view-model extraction ---------------------------------------------------

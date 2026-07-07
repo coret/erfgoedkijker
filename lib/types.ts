@@ -3,6 +3,9 @@
 
 export type LangLiteral = { value: string; lang?: string };
 
+/** Which schema.org namespace a source uses: recommended https, legacy http, or both. */
+export type SchemaOrgVariant = 'https' | 'http' | 'mixed';
+
 export type DefinedTermValue = {
   /** Language-tagged display name(s) from the publishing dataset. */
   name: LangLiteral[];
@@ -95,6 +98,10 @@ export type Diagnostics = {
   persistentId: PersistentId;
   /** Did the isPartOf dataset-description URI resolve to RDF? null = not present/checked. */
   datasetResolves: boolean | null;
+  /** The object's graph serialized as pretty-printed Turtle; null on fetch/parse failure. */
+  turtle: string | null;
+  /** schema.org namespace variant used by the source (https recommended); null = none present. */
+  schemaOrg: SchemaOrgVariant | null;
 };
 
 export type ObjectResponse = {

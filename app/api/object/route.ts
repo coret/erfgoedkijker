@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchLinkedData, extractObject, resolveDataset, FetchError } from '@/lib/rdf';
+import {
+  fetchLinkedData,
+  extractObject,
+  resolveDataset,
+  serializeTurtle,
+  detectSchemaOrgVariant,
+  FetchError,
+} from '@/lib/rdf';
+import type { SchemaOrgVariant } from '@/lib/types';
 import { buildPersistentId, detectScheme } from '@/lib/persistent-id';
 import type { ObjectResponse, GuidanceCode, ValueNode } from '@/lib/types';
 
@@ -42,11 +50,15 @@ export async function POST(req: NextRequest) {
     foundCreativeWork: false,
     persistentId: { scheme: detectScheme(url), ok: null as boolean | null },
     datasetResolves: null as boolean | null,
+    turtle: null as string | null,
+    schemaOrg: null as SchemaOrgVariant | null,
   };
 
   try {
     const { store, finalUrl, mediaType, tripleCount } = await fetchLinkedData(url);
     const { object, foundCreativeWork, datasetUri } = extractObject(store, finalUrl, url);
+    const turtle = await serializeTurtle(store);
+    const schemaOrg = detectSchemaOrgVariant(store);
 
     // Resolve the isPartOf dataset-description URI (title/description/publisher) and
     // render it inline under the existing "Onderdeel van dataset" field.
@@ -85,6 +97,8 @@ export async function POST(req: NextRequest) {
         foundCreativeWork,
         persistentId: buildPersistentId(url, finalUrl, true),
         datasetResolves,
+        turtle,
+        schemaOrg,
       },
     };
     return NextResponse.json(response);
