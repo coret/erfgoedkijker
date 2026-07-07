@@ -9,8 +9,10 @@ Plak een **permalink** van een erfgoedobject, klik **Bekijken**, en de ErfgoedKi
 
 1. haalt de linked data op via **content-negotiation** (voorkeur JSON-LD, anders
    Turtle / N-Triples / N-Quads / RDF-XML / TriG) met behulp van [Comunica];
-2. controleert of het object **beschikbaar is als linked data** en — als de URL een
-   ARK/Handle/DOI bevat — of de **persistente URI resolvet**;
+2. controleert of het object **beschikbaar is als linked data**, of het de aanbevolen
+   **`https://schema.org/`-namespace** gebruikt (en signaleert de afgeraden
+   `http://schema.org/`-variant), en — als de URL een ARK/Handle/DOI bevat — of de
+   **persistente URI resolvet**;
 3. toont **uitsluitend** de velden die het herkent volgens [SCHEMA-AP-NDE], met
    **Nederlandse labels**;
 4. toont `DefinedTerm`-waarden met taal (nl/en) en, als er een `sameAs`-URI is, als
@@ -18,7 +20,11 @@ Plak een **permalink** van een erfgoedobject, klik **Bekijken**, en de ErfgoedKi
 5. toont een **IIIF Presentation-manifest** in de [Tify] IIIF-viewer als dat aanwezig is;
 6. resolvet de **`isPartOf` datasetbeschrijving** en toont titel, beschrijving en uitgever
    als datasetkaart, met een deeplink naar het **[NDE Dataset Register]** en een controle
-   of de dataset-URI zelf linked data oplevert.
+   of de dataset-URI zelf linked data oplevert;
+7. toont desgewenst de **rauwe linked data als leesbare, syntax-gekleurde Turtle** —
+   uitklapbaar in het Controles-blok, genormaliseerd geserialiseerd uit de opgehaalde graph
+   (met [N3]); was de bron geen Turtle, dan vermeldt het label het bronformaat
+   (bijv. *bron was JSON-LD*).
 
 Gaat er iets mis — de URL resolvet niet, biedt geen linked data, is niet conform
 SCHEMA-AP-NDE, heeft geen IIIF-manifest of geen termen — dan toont de tool geen kale
@@ -27,6 +33,7 @@ naar de relevante NDE-documentatie. Wat wél beschikbaar is, wordt altijd getoon
 (graceful degradation).
 
 [Comunica]: https://comunica.dev/
+[N3]: https://github.com/rdfjs/N3.js
 [SCHEMA-AP-NDE]: https://docs.nde.nl/schema-profile/
 [NDE Termennetwerk]: https://docs.nde.nl/services/network-of-terms/graphql
 [NDE Dataset Register]: https://datasetregister.netwerkdigitaalerfgoed.nl/
