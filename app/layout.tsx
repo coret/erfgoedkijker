@@ -17,28 +17,23 @@ export default function RootLayout({
 }) {
   return (
     <html lang="nl">
-      <head>
-        <link
-          rel="preconnect"
-          href="https://rsms.me"
-          crossOrigin="anonymous"
-        />
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-      </head>
       <body>
         <header className="border-b border-nde-line bg-white">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-10">
             <a href="/" className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/nde-logo.svg" alt="Netwerk Digitaal Erfgoed" className="h-10 w-auto" />
-              <span className="text-sm font-semibold text-nde-muted">
-                ErfgoedKijker
+              <span className="text-3xl font-bold tracking-tight text-nde-ink">
+                Digitaal Erfgoed Kijker
               </span>
             </a>
           </div>
         </header>
-        <main className="mx-auto max-w-5xl px-5 py-8">{children}</main>
-        <footer className="mx-auto max-w-5xl px-5 py-10 text-xs text-nde-muted">
+        <main className="bg-nde-bg">
+          <div className="mx-auto max-w-5xl px-5 py-8">{children}</div>
+        </main>
+        <footer className="border-t border-nde-line bg-white">
+          <div className="mx-auto max-w-5xl px-5 py-10 text-sm text-nde-muted [text-wrap:balance]">
           Prototype (source:{' '}
           <a
             className="text-nde-blue hover:underline"
@@ -47,8 +42,7 @@ export default function RootLayout({
             rel="noreferrer"
           >
             Github
-          </a>
-          ) · toont uitsluitend velden die het herkent volgens{' '}
+          </a>), toont uitsluitend velden die het herkent volgens{' '}
           <a
             className="text-nde-blue hover:underline"
             href="https://docs.nde.nl/schema-profile/"
@@ -56,8 +50,7 @@ export default function RootLayout({
             rel="noreferrer"
           >
             SCHEMA-AP-NDE (versie 1.1.0)
-          </a>
-          · termen via het{' '}
+          </a>, termen via het{' '}
           <a
             className="text-nde-blue hover:underline"
             href="https://docs.nde.nl/services/network-of-terms/"
@@ -65,8 +58,16 @@ export default function RootLayout({
             rel="noreferrer"
           >
             NDE Termennetwerk
-          </a>
-          .
+          </a> en datasetbeschrijvingen via het{' '}
+          <a
+            className="text-nde-blue hover:underline"
+            href="https://datasetregister.netwerkdigitaalerfgoed.nl/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            NDE Dataset Register
+          </a>.
+          </div>
         </footer>
       </body>
     </html>

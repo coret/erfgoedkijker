@@ -59,9 +59,6 @@ export default function Page() {
   return (
     <div className="space-y-8">
       <section className="space-y-3">
-        <h1 className="text-3xl font-bold tracking-tight text-nde-ink">
-          ErfgoedKijker
-        </h1>
         <p className="text-nde-muted [text-wrap:balance]">
           Bekijk hoe een erfgoedobject, via linked data op basis van een erfgoedbrede standaard, eruit ziet. Plak een (perma)link van een erfgoedobject en klik op de <strong>Bekijken</strong> knop of klik op één van de voorbeelden.
         </p>

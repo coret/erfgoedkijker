@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Inter, self-hosted from /public/fonts (no external resources). */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/InterVariable.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/InterVariable-Italic.woff2') format('woff2');
+}
+
 :root {
   color-scheme: light;
 }
@@ -13,7 +29,7 @@ body {
 }
 
 body {
-  @apply bg-nde-bg text-nde-ink font-sans antialiased;
+  @apply text-nde-ink font-sans antialiased;
 }
 
 /* Tify viewer fills its container */

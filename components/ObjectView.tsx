@@ -62,21 +62,23 @@ export function ObjectView({ obj }: { obj: ObjectViewModel }) {
 
   return (
     <article className="space-y-5">
-      <header>
-        <div className="text-xs font-semibold uppercase tracking-wide text-nde-blue">
-          {obj.typeLabelNl}
+      <header className="ml-[calc(50%-50vw)] w-screen bg-nde-blue">
+        <div className="mx-auto max-w-5xl px-5 py-6 text-white">
+          <div className="text-xs font-semibold uppercase tracking-wide text-white/80">
+            {obj.typeLabelNl}
+          </div>
+          <h1 className="mt-1 text-2xl font-bold text-white">
+            {heading ?? <MissingRequired />}
+          </h1>
+          <a
+            href={obj.uri}
+            target="_blank"
+            rel="noreferrer"
+            className="break-all text-xs text-white/80 hover:text-white hover:underline"
+          >
+            {obj.uri}
+          </a>
         </div>
-        <h1 className="mt-1 text-2xl font-bold text-nde-ink">
-          {heading ?? <MissingRequired />}
-        </h1>
-        <a
-          href={obj.uri}
-          target="_blank"
-          rel="noreferrer"
-          className="break-all text-xs text-nde-muted hover:text-nde-blue hover:underline"
-        >
-          {obj.uri}
-        </a>
       </header>
 
       {obj.iiifManifestUrl && (
