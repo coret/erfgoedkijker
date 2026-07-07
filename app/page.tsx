@@ -68,7 +68,7 @@ export default function Page() {
             e.preventDefault();
             lookup(url);
           }}
-          className="flex flex-col gap-2 sm:flex-row"
+          className="flex flex-col gap-2 py-3 sm:flex-row"
         >
           <input
             type="url"

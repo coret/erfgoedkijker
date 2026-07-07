@@ -22,6 +22,12 @@
   color-scheme: light;
 }
 
+html {
+  /* Always reserve space for the vertical scrollbar so content doesn't shift when
+     longer pages (e.g. an object view) introduce one. */
+  scrollbar-gutter: stable;
+}
+
 html,
 body {
   padding: 0;

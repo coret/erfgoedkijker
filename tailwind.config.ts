@@ -11,10 +11,10 @@ const config: Config = {
       colors: {
         // NDE huisstijl: logo-blauw als primair, oranje als accent (docs.nde.nl)
         nde: {
-          blue: '#093ef5',
+          blue: '#0a3dfa',
           'blue-dark': '#0731c4',
           'blue-soft': '#eaeefe',
-          orange: '#f95200',
+          orange: '#fa5200',
           'orange-dark': '#e44a00',
           ink: '#0b1020',
           muted: '#5b6577',

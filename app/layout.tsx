@@ -34,7 +34,7 @@ export default function RootLayout({
         </main>
         <footer className="border-t border-nde-line bg-white">
           <div className="mx-auto max-w-5xl px-5 py-10 text-sm text-nde-muted [text-wrap:balance]">
-          Prototype (source:{' '}
+          Prototype (broncode via{' '}
           <a
             className="text-nde-blue hover:underline"
             href="https://github.com/coret/erfgoedkijker"
@@ -42,7 +42,7 @@ export default function RootLayout({
             rel="noreferrer"
           >
             Github
-          </a>), toont uitsluitend velden die het herkent volgens{' '}
+          </a>) dat linked data uit de bron laat zien, het toont uitsluitend velden die het herkent volgens{' '}
           <a
             className="text-nde-blue hover:underline"
             href="https://docs.nde.nl/schema-profile/"
