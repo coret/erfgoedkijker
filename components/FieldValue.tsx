@@ -13,6 +13,15 @@ function LangBadge({ lang }: { lang?: string }) {
   );
 }
 
+/** Green badge for a term's extra schema.org type (e.g. Person, Organization). */
+function TypeBadge({ type }: { type: string }) {
+  return (
+    <span className="ml-1.5 rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-green-800">
+      {type}
+    </span>
+  );
+}
+
 function pickLiteral(lits: LangLiteral[]): LangLiteral | undefined {
   return (
     lits.find((l) => l.lang === 'nl') ??
@@ -31,6 +40,7 @@ function TermValue({ term }: { term: DefinedTermValue }) {
       <span>
         {text}
         <LangBadge lang={label?.lang} />
+        {term.types?.map((t) => <TypeBadge key={t} type={t} />)}
       </span>
     );
   }
@@ -45,6 +55,7 @@ function TermValue({ term }: { term: DefinedTermValue }) {
         {text}
       </button>
       <LangBadge lang={label?.lang} />
+      {term.types?.map((t) => <TypeBadge key={t} type={t} />)}
       {open && <TermPanel uri={term.sameAs} onClose={() => setOpen(false)} />}
     </span>
   );

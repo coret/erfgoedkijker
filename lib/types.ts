@@ -11,6 +11,8 @@ export type DefinedTermValue = {
   name: LangLiteral[];
   /** Canonical term URI in a controlled vocabulary (clickable → Termennetwerk). */
   sameAs?: string;
+  /** Extra schema.org type local names beyond DefinedTerm (e.g. ["Person"]); DefinedTerm excluded. */
+  types?: string[];
 };
 
 export type MediaValue = {

@@ -381,9 +381,14 @@ function mapValue(ctx: Ctx, term: RDF.Term, depth: number): ValueNode | null {
     ctx.termCount.n += 1;
     const sameAs = firstIri(objectsFor(store, term, 'sameAs')) ??
       (term.termType === 'NamedNode' ? term.value : undefined);
+    const extra = types.filter((t) => t !== 'DefinedTerm');
     return {
       kind: 'term',
-      term: { name: langLiterals(objectsFor(store, term, 'name')), sameAs },
+      term: {
+        name: langLiterals(objectsFor(store, term, 'name')),
+        sameAs,
+        types: extra.length ? extra : undefined,
+      },
     };
   }
 
