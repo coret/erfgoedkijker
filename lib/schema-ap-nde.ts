@@ -15,7 +15,13 @@ export function schemaLocal(iri: string): string | null {
   return null;
 }
 
-export type PropertyDef = { name: string; labelNl: string; required?: boolean };
+export type PropertyDef = {
+  name: string;
+  labelNl: string;
+  required?: boolean;
+  /** Dutch (≈ B1) explanation of the field, shown via an info popover. */
+  descriptionNl?: string;
+};
 
 export type ClassDef = {
   /** schema.org local name */
@@ -54,24 +60,107 @@ export const PROFILE: Record<string, ClassDef> = {
     labelNl: 'Erfgoedobject',
     // Order and required flags follow SCHEMA-AP-NDE (https://docs.nde.nl/schema-profile/).
     properties: [
-      { name: 'identifier', labelNl: 'Identificatie' },
+      {
+        name: 'identifier',
+        labelNl: 'Identificatie',
+        descriptionNl:
+          "Een unieke code voor het erfgoedobject, meestal een reeks letters en cijfers. Handig om het object mee aan te duiden buiten de linked data, bijvoorbeeld bij een tentoonstelling.",
+      },
       { name: 'name', labelNl: 'Titel', required: true },
-      { name: 'description', labelNl: 'Beschrijving' },
-      { name: 'additionalType', labelNl: 'Objecttype' },
-      { name: 'creator', labelNl: 'Maker' },
-      { name: 'abstract', labelNl: 'Samenvatting' },
-      { name: 'text', labelNl: 'Tekst' },
-      { name: 'size', labelNl: 'Afmetingen' },
-      { name: 'contentLocation', labelNl: 'Afgebeelde locatie' },
-      { name: 'temporalCoverage', labelNl: 'Periode' },
-      { name: 'about', labelNl: 'Onderwerp' },
-      { name: 'locationCreated', labelNl: 'Vervaardigingsplaats' },
-      { name: 'dateCreated', labelNl: 'Datering' },
-      { name: 'material', labelNl: 'Materiaal' },
-      { name: 'genre', labelNl: 'Genre' },
-      { name: 'associatedMedia', labelNl: 'Media' },
-      { name: 'sdDatePublished', labelNl: 'Metadata laatst gewijzigd', required: true },
-      { name: 'isPartOf', labelNl: 'Onderdeel van dataset' },
+      {
+        name: 'description',
+        labelNl: 'Beschrijving',
+        descriptionNl: 'Een volledige beschrijving van het erfgoedobject.',
+      },
+      {
+        name: 'additionalType',
+        labelNl: 'Objecttype',
+        descriptionNl:
+          'Extra typeringen van het erfgoedobject uit andere woordenlijsten dan Schema.org, zoals Getty AAT.',
+      },
+      {
+        name: 'creator',
+        labelNl: 'Maker',
+        descriptionNl:
+          'De persoon of organisatie die heeft meegewerkt aan het maken van het erfgoedobject.',
+      },
+      {
+        name: 'abstract',
+        labelNl: 'Samenvatting',
+        descriptionNl:
+          'Een korte samenvatting van het erfgoedobject in één zin. Gebruik hierin geen vakjargon of afkortingen, zodat iedereen het kan begrijpen.',
+      },
+      {
+        name: 'text',
+        labelNl: 'Tekst',
+        descriptionNl:
+          "De volledige tekstinhoud van het erfgoedobject, vooral bedoeld om het vindbaar te maken via zoeken. Denk aan de hele tekst van een verhaal, of tekst die is overgenomen uit beeld, zoals opschriften op foto's.",
+      },
+      {
+        name: 'size',
+        labelNl: 'Afmetingen',
+        descriptionNl:
+          'Hoe groot het erfgoedobject fysiek is, weergegeven op de gebruikelijke manier.',
+      },
+      {
+        name: 'contentLocation',
+        labelNl: 'Afgebeelde locatie',
+        descriptionNl:
+          'De plaats(en) die in het erfgoedobject te zien zijn of worden beschreven. Bijvoorbeeld de locatie op een foto of schilderij.',
+      },
+      {
+        name: 'temporalCoverage',
+        labelNl: 'Periode',
+        descriptionNl:
+          'De periode waar het erfgoedobject over gaat: de tijd die het beschrijft of laat zien.',
+      },
+      {
+        name: 'about',
+        labelNl: 'Onderwerp',
+        descriptionNl:
+          'Het onderwerp van het erfgoedobject. Bijvoorbeeld wat er op een schilderij of foto te zien is, waar een verhaal over gaat, of over welk ander object (zoals een collectiestuk) dit erfgoedobject gaat.',
+      },
+      {
+        name: 'locationCreated',
+        labelNl: 'Vervaardigingsplaats',
+        descriptionNl:
+          'De plaats(en) waar het erfgoedobject is gemaakt. Dit kan een andere plek zijn dan de plek die het object laat zien (de afgebeelde locatie).',
+      },
+      {
+        name: 'dateCreated',
+        labelNl: 'Datering',
+        descriptionNl: 'De datum waarop het erfgoedobject is gemaakt.',
+      },
+      {
+        name: 'material',
+        labelNl: 'Materiaal',
+        descriptionNl:
+          'Het materiaal of de materialen waarvan het erfgoedobject is gemaakt, bijvoorbeeld leer, wol, katoen of papier.',
+      },
+      {
+        name: 'genre',
+        labelNl: 'Genre',
+        descriptionNl:
+          'Het genre of de genres van het erfgoedobject, bijvoorbeeld een kunststroming of periode.',
+      },
+      {
+        name: 'associatedMedia',
+        labelNl: 'Media',
+        descriptionNl:
+          'Eén of meer mediabestanden (zoals afbeeldingen) die het erfgoedobject tonen.',
+      },
+      {
+        name: 'sdDatePublished',
+        labelNl: 'Metadata laatst gewijzigd',
+        required: true,
+        descriptionNl:
+          'De datum waarop de metadata (de beschrijving van het object) voor het laatst is aangepast.',
+      },
+      {
+        name: 'isPartOf',
+        labelNl: 'Onderdeel van dataset',
+        descriptionNl: 'De dataset(s) waar het erfgoedobject onderdeel van is.',
+      },
     ],
   },
   Person: {

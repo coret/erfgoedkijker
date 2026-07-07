@@ -1,6 +1,7 @@
 import type { ObjectView as ObjectViewModel, LangLiteral, Field } from '@/lib/types';
 import { FieldValue } from './FieldValue';
 import { IiifViewer } from './IiifViewer';
+import { PropertyInfo } from './PropertyInfo';
 import { PROFILE } from '@/lib/schema-ap-nde';
 
 /** Orange badge for a required profile property that has no value. */
@@ -22,7 +23,13 @@ function nameLiteral(obj: ObjectViewModel): string | null {
   return pick?.value ?? null;
 }
 
-type Row = { property: string; labelNl: string; required: boolean; field?: Field };
+type Row = {
+  property: string;
+  labelNl: string;
+  required: boolean;
+  descriptionNl?: string;
+  field?: Field;
+};
 
 /**
  * Rows to render below the heading. For a CreativeWork we show *every* profile
@@ -40,6 +47,7 @@ function rowsFor(obj: ObjectViewModel): Row[] {
         property: p.name,
         labelNl: p.labelNl,
         required: Boolean(p.required),
+        descriptionNl: p.descriptionNl,
         field: byProp.get(p.name),
       }));
   }
@@ -82,7 +90,10 @@ export function ObjectView({ obj }: { obj: ObjectViewModel }) {
       <dl className="divide-y divide-nde-line rounded-2xl border border-nde-line bg-white">
         {rows.map((r) => (
           <div key={r.property} className="grid grid-cols-1 gap-1 px-5 py-3 sm:grid-cols-[12rem_1fr] sm:gap-4">
-            <dt className="text-sm font-medium text-nde-muted">{r.labelNl}</dt>
+            <dt className="flex items-center text-sm font-medium text-nde-muted">
+              {r.labelNl}
+              {r.descriptionNl && <PropertyInfo text={r.descriptionNl} />}
+            </dt>
             <dd className="min-h-[1.25rem] space-y-2 text-sm text-nde-ink">
               {r.field
                 ? r.field.values.map((v, i) => (
