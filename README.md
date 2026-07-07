@@ -13,8 +13,11 @@ Plak een **permalink** van een erfgoedobject, klik **Bekijken**, en de ErfgoedKi
    **`https://schema.org/`-namespace** gebruikt (en signaleert de afgeraden
    `http://schema.org/`-variant), en — als de URL een ARK/Handle/DOI bevat — of de
    **persistente URI resolvet**;
-3. toont **uitsluitend** de velden die het herkent volgens [SCHEMA-AP-NDE], met
-   **Nederlandse labels**;
+3. toont voor een erfgoedobject (`CreativeWork`) **alle** [SCHEMA-AP-NDE]-properties in de
+   **volgorde van het profiel**, met **Nederlandse labels** — óók lege velden (als leeg
+   waarde-vlak), zodat de weergave meteen een volledigheidscheck is; bij een ontbrekende
+   **verplichte** property (`name`, `sdDatePublished`) verschijnt een duidelijke melding
+   *"Deze verplichte waarde ontbreekt"*. Overige types tonen de herkende velden;
 4. toont `DefinedTerm`-waarden met taal (nl/en) en, als er een `sameAs`-URI is, als
    klikbare link die de term opzoekt via het **[NDE Termennetwerk]**;
 5. toont een **IIIF Presentation-manifest** in de [Tify] IIIF-viewer als dat aanwezig is;
