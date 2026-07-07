@@ -36,4 +36,9 @@ export const EXAMPLES: Example[] = [
     url: 'https://n2t.net/ark:/60537/bwrGXt',
     note: 'Kadastrale kaart (minuutplan) Gouda, sectie C, blad 01 (1811-1832)',
   },
+  {
+    label: 'Maliebaan verhaal',
+    url: 'https://n2t.net/ark:/88585/e04696c4-56b3-483c-8ebb-b785c5f3aab4',
+    note: 'De Maliebaan als bolwerk van de NSB',
+  },
 ];
