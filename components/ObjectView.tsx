@@ -90,7 +90,7 @@ export function ObjectView({ obj }: { obj: ObjectViewModel }) {
       <dl className="divide-y divide-nde-line rounded-2xl border border-nde-line bg-white">
         {rows.map((r) => (
           <div key={r.property} className="grid grid-cols-1 gap-1 px-5 py-3 sm:grid-cols-[12rem_1fr] sm:gap-4">
-            <dt className="flex items-center text-sm font-medium text-nde-muted">
+            <dt className="flex items-start text-sm font-medium text-nde-muted sm:justify-end sm:text-right">
               {r.labelNl}
               {r.descriptionNl && <PropertyInfo text={r.descriptionNl} />}
             </dt>
