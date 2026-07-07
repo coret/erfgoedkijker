@@ -1,7 +1,5 @@
 // Voorbeeld-permalinks getoond onder het invoerveld. Elk is geverifieerd: het
-// resolvet en levert linked data. Een relatieve URL (begint met "/") wordt door de
-// pagina omgezet naar een absolute URL op basis van de huidige host — dit is het
-// zelf-gehoste, volledig SCHEMA-AP-NDE-conforme demonstratieobject.
+// resolvet en levert linked data.
 
 export type Example = {
   label: string;
@@ -10,12 +8,6 @@ export type Example = {
 };
 
 export const EXAMPLES: Example[] = [
-//  {
-//    label: 'Volledig voorbeeld',
-//    url: '/examples/schema-ap-nde',
-//    note:
-//      'Zelf-gehost, volledig SCHEMA-AP-NDE-conform: CreativeWork met termen (DefinedTerm + sameAs naar RKD/Getty) en een IIIF-manifest. Toont alle functies, inclusief het opzoeken van termen in het Termennetwerk.',
-//  },
   {
     label: 'Herdenking',
     url: 'https://n2t.net/ark:/48228/MFF_1709840',
