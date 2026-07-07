@@ -37,7 +37,7 @@ export function PropertyInfo({ text }: { text: string }) {
       {open && (
         <span
           role="tooltip"
-          className="absolute left-0 top-6 z-10 w-64 rounded-xl border border-nde-line bg-white p-3 text-xs font-normal normal-case leading-relaxed text-nde-ink shadow-card"
+          className="absolute left-0 top-6 z-10 w-64 rounded-xl border border-nde-line bg-white p-3 text-left text-xs font-normal normal-case leading-relaxed text-nde-ink shadow-card"
         >
           {text}
         </span>
