@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "title": "NDE Heritage Viewer",
+    "description": "View a heritage object as linked data according to SCHEMA-AP-NDE. A prototype of the Dutch Digital Heritage Network."
+  },
+  "app": {
+    "name": "Digital Heritage Viewer",
+    "logoAlt": "Dutch Digital Heritage Network"
+  },
+  "lang": {
+    "switchLabel": "Language",
+    "nl": "Dutch",
+    "en": "English"
+  },
+  "page": {
+    "intro": "See what a heritage object looks like as linked data, based on a sector-wide standard. Paste a (perma)link to a heritage object and press the <b>View</b> button, or pick one of the examples.",
+    "placeholder": "https://… permalink of a heritage object",
+    "inputAria": "Permalink of a heritage object",
+    "submit": "View",
+    "submitLoading": "Working…",
+    "examples": "Examples:"
+  },
+  "footer": {
+    "body": "Prototype (source code on <github>Github</github>) that shows linked data straight from the source; it displays only the fields it recognises according to <profile>SCHEMA-AP-NDE (version 1.1.0)</profile>, terms via the <terms>NDE Network of Terms</terms> and dataset descriptions via the <register>NDE Dataset Register</register>."
+  },
+  "errors": {
+    "INVALID_URL": "Please enter a valid http(s) permalink.",
+    "NO_URIS": "Provide at least one term URI.",
+    "TERM_LOOKUP_FAILED": "Looking up the term in the Network of Terms failed.",
+    "NETWORK": "The request could not be completed.",
+    "UNKNOWN": "Something went wrong."
+  },
+  "object": {
+    "missingRequired": "This required value is missing"
+  },
+  "field": {
+    "termFallback": "term",
+    "dataset": "Dataset",
+    "publisher": "Publisher:",
+    "datasetNoLinkedData": "⚠ This dataset URI returned no linked data.",
+    "datasetRegister": "View in the NDE Dataset Register ↗",
+    "file": "File ↗",
+    "license": "License ↗",
+    "iiifNote": "IIIF manifest present — see the viewer above.",
+    "manifestLink": "manifest ↗"
+  },
+  "diagnostics": {
+    "title": "Checks",
+    "linkedData": "Available as linked data",
+    "recognized": "Recognised as a SCHEMA-AP-NDE object",
+    "notRecognized": "Not recognised",
+    "namespace": "schema.org namespace",
+    "namespaceHttp": "http (discouraged)",
+    "namespaceMixed": "http + https",
+    "persistentUri": "Persistent URI",
+    "persistentUriScheme": "Persistent URI ({scheme})",
+    "notPresent": "Not found",
+    "resolves": "Resolves",
+    "resolvesNot": "Does not resolve",
+    "missingLangTags": "Text values without a language tag",
+    "licenseMatch": "Media licence matches the manifest",
+    "datasetResolves": "Dataset URI resolves",
+    "format": "Format",
+    "triples": "Triples",
+    "resolvedTo": "Resolved to",
+    "mediaLicense": "Media licence",
+    "manifestLicense": "Manifest licence",
+    "turtleRaw": "Raw linked data (Turtle)",
+    "turtleRawFrom": "Raw linked data (Turtle, source was {format})"
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "guidance": {
+    "suggestionLabel": "Suggestion:"
+  },
+  "term": {
+    "title": "Network of Terms",
+    "hide": "hide ✕",
+    "loading": "Looking up…",
+    "none": "No information found in the Network of Terms for this URI.",
+    "source": "Source:",
+    "alsoKnownAs": "Also known as:"
+  },
+  "propertyInfo": {
+    "aria": "About this field"
+  }
+}

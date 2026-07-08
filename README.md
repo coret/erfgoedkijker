@@ -14,7 +14,7 @@ Plak een **permalink** van een erfgoedobject, klik **Bekijken**, en de ErfgoedKi
    `http://schema.org/`-variant), en — als de URL een ARK/Handle/DOI bevat — of de
    **persistente URI resolvet**;
 3. toont voor een erfgoedobject (`CreativeWork`) **alle** [SCHEMA-AP-NDE]-properties in de
-   **volgorde van het profiel**, met **Nederlandse labels** — óók lege velden (als leeg
+   **volgorde van het profiel**, met labels in de interfacetaal — óók lege velden (als leeg
    waarde-vlak), zodat de weergave meteen een volledigheidscheck is; bij een ontbrekende
    **verplichte** property (`name`, `sdDatePublished`) verschijnt een duidelijke melding
    *"Deze verplichte waarde ontbreekt"*. Overige types tonen de herkende velden;
@@ -34,6 +34,36 @@ SCHEMA-AP-NDE, heeft geen IIIF-manifest of geen termen — dan toont de tool gee
 foutmelding maar een **laagdrempelige uitleg met een motiverende suggestie** en een link
 naar de relevante NDE-documentatie. Wat wél beschikbaar is, wordt altijd getoond
 (graceful degradation).
+
+## Tweetalig: Nederlands en Engels
+
+De interface is beschikbaar in het **Nederlands (standaard)** en **Engels**, om te wisselen
+is er een taalschakelaar in de header. De keuze wordt bewaard in een `locale`-cookie; de
+URL verandert niet, dus `?url=`-deeplinks blijven werken.
+
+De **getoonde metadata volgt de interfacetaal**:
+
+- Heeft een veld waarden met een taaltag in de interfacetaal, dan worden alleen die getoond.
+- Zo niet, dan waarden **zonder** taaltag.
+- Zijn die er ook niet, dan worden **alle** aanwezige waarden getoond — er verdwijnt nooit
+  data omdat de taal niet klopt. De taalbadge (`NL`/`EN`) laat zien wat je ziet.
+
+Dit samenvouwen geldt alleen voor de properties die volgens SCHEMA-AP-NDE een
+`rdf:langString` moeten zijn (`name`, `description`, `abstract`, `text`, `copyrightNotice`)
+— hun meerdere literals zíjn vertalingen van elkaar. Meerwaardige velden als `about`,
+`material` en `identifier` blijven onaangeroerd: `"Amsterdam"@nl` en
+`"Second World War"@en` zijn twee onderwerpen, niet één onderwerp in twee talen.
+
+Het wisselen van taal doet **geen nieuwe lookup**: de view-model die `/api/object` teruggeeft
+bevat geen labels, alleen de schema.org-namen (`creator`, `Person`). De client zoekt het
+label op in het profiel. Wisselen is daarmee een puur server-side hertekening van de
+Server Components, waarbij de opgehaalde resultaten in beeld blijven staan.
+
+Ook de **IIIF-viewer** volgt de interfacetaal: zowel zijn eigen knoppen (zoomen, draaien,
+bladeren) als de labels uit het IIIF-manifest zelf. Tify levert de Nederlandse strings mee;
+`app/tify-translations/` serveert dat bestand rechtstreeks uit het `tify`-pakket, zodat het
+nooit uit de pas kan lopen met de versie in `package.json`. Bij een taalwissel wordt de
+viewer niet opnieuw opgebouwd (`tify.setLanguage()`), dus de pagina en zoom blijven staan.
 
 [Comunica]: https://comunica.dev/
 [N3]: https://github.com/rdfjs/N3.js
@@ -62,6 +92,12 @@ naar de relevante NDE-documentatie. Wat wél beschikbaar is, wordt altijd getoon
 npm install
 npm run dev
 # open http://localhost:3000
+```
+
+Unit tests (geen testframework nodig, draait op `node:test`):
+
+```bash
+npm test
 ```
 
 ## Productie-build
@@ -94,11 +130,16 @@ docker run -d --name erfgoedkijker \
   -e PORT=3003 \
   -p 3003:3003 \
   --restart unless-stopped \
-  --health-cmd 'wget -qO- http://localhost:3003/api/health || exit 1' \
+  --health-cmd 'wget -qO- http://127.0.0.1:3003/api/health || exit 1' \
   --health-interval 30s \
   erfgoedkijker:latest
 # http://localhost:3003
 ```
+
+> De health-check gebruikt **`127.0.0.1`**, niet `localhost`: in de Alpine-container
+> resolvet `localhost` eerst naar `::1`, terwijl de Node-server alleen op IPv4 luistert
+> (`HOSTNAME=0.0.0.0`). Met `localhost` blijft de container daardoor eeuwig `unhealthy`
+> terwijl hij prima draait.
 
 Beheren:
 
@@ -134,24 +175,37 @@ kubectl apply -f k8s/
 ```
 app/
   page.tsx              Beginscherm (invoerveld, Bekijken, voorbeelden) + resultaat
-  layout.tsx            NDE-header/footer, huisstijl
+  layout.tsx            NDE-header/footer + taalschakelaar (Server Action zet de cookie)
   api/object/route.ts   Proxy: dereference (Comunica) → ViewModel + diagnostiek
   api/term/route.ts     Proxy: Termennetwerk lookup(uris:)
   api/iiif/route.ts     Fallback-proxy voor IIIF-manifests (CORS)
   api/health/route.ts   Health-check
-components/             ObjectView, FieldValue, Diagnostics, Guidance, TermPanel, IiifViewer
+  tify-translations/    Serveert Tify's nl.json uit het tify-pakket (IIIF-viewer UI)
+components/             ObjectView, FieldValue, Diagnostics, Guidance, TermPanel,
+                        IiifViewer, LanguageSwitch
+i18n/request.ts         next-intl: leest de locale-cookie, laadt de messages
+messages/nl.json        Interfaceteksten (Nederlands, standaard)
+messages/en.json        Interfaceteksten (Engels)
+global.d.ts             next-intl AppConfig (Locale + typed message keys)
 lib/
-  schema-ap-nde.ts      Toegestane klassen + property→Nederlands label
+  i18n.ts               Locale + pickLiteral/selectValues (taalkeuze van de metadata)
+  i18n.test.ts          Unit tests voor pickLiteral/selectValues (`npm test`)
+  schema-ap-nde.ts      Toegestane klassen + property→label (nl/en) + veldtoelichting
   rdf.ts                Comunica dereference + N3-store + ViewModel-extractie
   termennetwerk.ts      GraphQL lookup-by-URI client
   persistent-id.ts      ARK/Handle/DOI/URN:NBN detectie + resolve-check
-  guidance.ts           Faalsituaties → uitleg + suggestie + doc-link
+  guidance.ts           Faalsituaties → uitleg + suggestie + doc-link (nl/en)
   examples.ts           Voorbeeld-permalinks onder het invoerveld
   types.ts              Gedeelde ViewModel-types
 k8s/                    Deployment, Service, Ingress
 Dockerfile              Multi-stage build (standalone)
 PLAN.md                 Ontwerp / plan
 ```
+
+De vertalingen staan op twee plekken, elk waar ze horen: **interfaceteksten** in
+`messages/{nl,en}.json` (statische keys, dus door TypeScript gecontroleerd), en de
+**profiel-labels** bij hun `PropertyDef` in `lib/schema-ap-nde.ts` — die zijn gesleuteld op
+de schema.org-namen die toch al in het ViewModel zitten.
 
 ## Wat de ErfgoedKijker (bewust) niet doet
 

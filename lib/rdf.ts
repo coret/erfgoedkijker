@@ -12,10 +12,10 @@ import {
   MEDIA_TYPES,
   CREATIVEWORK_SUBTYPES,
   TOP_LEVEL_TYPES,
-  classLabelNl,
   isIiifEncodingFormat,
   type PropertyDef,
 } from './schema-ap-nde';
+import { TRANSLATABLE_PROPERTIES } from './i18n';
 import type {
   ObjectView,
   MappedResource,
@@ -232,7 +232,9 @@ const LANG_NAME_CLASSES = new Set<string>([
   'Person',
   'Place',
 ]);
-const LANG_REQUIRED_PROPS = new Set(['name', 'description', 'abstract', 'text', 'copyrightNotice']);
+// The properties that must be an rdf:langString. Shared with the display-side language
+// selection in `lib/i18n.ts`, which collapses translations of exactly these properties.
+const LANG_REQUIRED_PROPS = TRANSLATABLE_PROPERTIES;
 
 /**
  * Count text values that should carry a language tag but don't: `name`
@@ -475,8 +477,9 @@ function mapValue(ctx: Ctx, term: RDF.Term, depth: number): ValueNode | null {
       resource: {
         uri: term.termType === 'NamedNode' ? term.value : undefined,
         type: 'Thing',
-        typeLabelNl: 'Verwijzing',
-        fields: [{ property: 'name', labelNl: 'Naam', values: names.map((n) => ({ kind: 'literal', value: n }) as ValueNode) }],
+        fields: [
+          { property: 'name', values: names.map((n) => ({ kind: 'literal', value: n }) as ValueNode) },
+        ],
       },
     };
   }
@@ -498,13 +501,12 @@ function mapResource(
       const objs = objectsFor(ctx.store, subject, prop.name);
       if (!objs.length) continue;
       const values = objs.map((o) => mapValue(ctx, o, depth)).filter((v): v is ValueNode => v !== null);
-      if (values.length) fields.push({ property: prop.name, labelNl: prop.labelNl, values });
+      if (values.length) fields.push({ property: prop.name, values });
     }
   }
   return {
     uri: subject.termType === 'NamedNode' ? subject.value : undefined,
     type,
-    typeLabelNl: classLabelNl(type),
     fields,
   };
 }
@@ -546,7 +548,6 @@ export function extractObject(
   const object: ObjectView = {
     uri: main.subject.value,
     type: main.type,
-    typeLabelNl: classLabelNl(main.type),
     fields: resource.fields,
     iiifManifestUrl,
     termCount: ctx.termCount.n,

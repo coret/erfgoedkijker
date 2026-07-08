@@ -1,18 +1,26 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { ObjectResponse } from '@/lib/types';
+import { useLocale, useTranslations } from 'next-intl';
+import type { ApiErrorCode, ObjectResponse } from '@/lib/types';
 import { EXAMPLES } from '@/lib/examples';
 import { ObjectView } from '@/components/ObjectView';
 import { ObjectSkeleton } from '@/components/ObjectSkeleton';
 import { Diagnostics } from '@/components/Diagnostics';
 import { Guidance } from '@/components/Guidance';
 
+/** Error *codes*, never prose: translated at render, so a language switch is never stale. */
+type ErrorCode = ApiErrorCode | 'NETWORK' | 'UNKNOWN';
+
+const API_ERROR_CODES = new Set<string>(['INVALID_URL', 'NO_URIS', 'TERM_LOOKUP_FAILED']);
+
 export default function Page() {
+  const t = useTranslations('page');
+  const te = useTranslations('errors');
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<ObjectResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ErrorCode | null>(null);
 
   const lookup = useCallback(async (target: string) => {
     let value = target.trim();
@@ -39,12 +47,12 @@ export default function Page() {
       });
       const json = await res.json();
       if (!res.ok && !json.diagnostics) {
-        setError(json.error ?? 'Er ging iets mis.');
+        setError(API_ERROR_CODES.has(json.error) ? (json.error as ApiErrorCode) : 'UNKNOWN');
         return;
       }
       setData(json as ObjectResponse);
-    } catch (e) {
-      setError((e as Error).message);
+    } catch {
+      setError('NETWORK');
     } finally {
       setLoading(false);
     }
@@ -60,7 +68,7 @@ export default function Page() {
     <div className="space-y-8">
       <section className="space-y-3">
         <p className="text-nde-muted [text-wrap:balance]">
-          Bekijk hoe een erfgoedobject, via linked data op basis van een erfgoedbrede standaard, eruit ziet. Plak een (perma)link van een erfgoedobject en klik op de <strong>Bekijken</strong> knop of klik op één van de voorbeelden.
+          {t.rich('intro', { b: (chunks) => <strong>{chunks}</strong> })}
         </p>
 
         <form
@@ -75,40 +83,25 @@ export default function Page() {
             inputMode="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://… permalink van een erfgoedobject"
+            placeholder={t('placeholder')}
             className="w-full rounded-xl border border-nde-line bg-white px-4 py-3 text-nde-ink shadow-sm outline-none focus:border-nde-blue focus:ring-2 focus:ring-nde-blue/20"
-            aria-label="Permalink van een erfgoedobject"
+            aria-label={t('inputAria')}
           />
           <button
             type="submit"
             disabled={loading || !url.trim()}
             className="shrink-0 rounded-xl bg-nde-blue px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-nde-blue-dark disabled:opacity-50"
           >
-            {loading ? 'Bezig…' : 'Bekijken'}
+            {loading ? t('submitLoading') : t('submit')}
           </button>
         </form>
 
-        {EXAMPLES.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-nde-muted">Voorbeelden:</span>
-            {EXAMPLES.map((ex) => (
-              <button
-                key={ex.url}
-                type="button"
-                onClick={() => lookup(ex.url)}
-                title={ex.note ?? ex.url}
-                className="rounded-full border border-nde-line bg-white px-3 py-1 text-nde-blue transition hover:border-nde-blue hover:bg-nde-blue-soft"
-              >
-                {ex.label}
-              </button>
-            ))}
-          </div>
-        )}
+        {EXAMPLES.length > 0 && <ExampleChips onPick={lookup} />}
       </section>
 
       {error && (
         <div className="rounded-2xl border border-nde-orange/30 bg-nde-orange/5 p-4 text-sm text-nde-orange-dark">
-          {error}
+          {te(error)}
         </div>
       )}
 
@@ -117,6 +110,27 @@ export default function Page() {
       {data && (
         <Results data={data} />
       )}
+    </div>
+  );
+}
+
+function ExampleChips({ onPick }: { onPick: (url: string) => void }) {
+  const t = useTranslations('page');
+  const locale = useLocale();
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-sm">
+      <span className="text-nde-muted">{t('examples')}</span>
+      {EXAMPLES.map((ex) => (
+        <button
+          key={ex.url}
+          type="button"
+          onClick={() => onPick(ex.url)}
+          title={ex.note ?? ex.url}
+          className="rounded-full border border-nde-line bg-white px-3 py-1 text-nde-blue transition hover:border-nde-blue hover:bg-nde-blue-soft"
+        >
+          {ex.label[locale]}
+        </button>
+      ))}
     </div>
   );
 }

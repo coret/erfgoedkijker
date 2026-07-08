@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import type { ApiErrorCode } from '@/lib/types';
 
 type TermResult = {
   uri: string;
@@ -16,9 +18,14 @@ type TermLookup = {
   error?: string;
 };
 
+/** Error *codes*, never prose: translated at render, so a language switch is never stale. */
+type ErrorCode = ApiErrorCode | 'NETWORK';
+
 export function TermPanel({ uri, onClose }: { uri: string; onClose: () => void }) {
+  const t = useTranslations('term');
+  const te = useTranslations('errors');
   const [state, setState] = useState<
-    { status: 'loading' } | { status: 'error'; message: string } | { status: 'done'; lookups: TermLookup[] }
+    { status: 'loading' } | { status: 'error'; code: ErrorCode } | { status: 'done'; lookups: TermLookup[] }
   >({ status: 'loading' });
 
   useEffect(() => {
@@ -33,12 +40,12 @@ export function TermPanel({ uri, onClose }: { uri: string; onClose: () => void }
         const data = await res.json();
         if (cancelled) return;
         if (!res.ok) {
-          setState({ status: 'error', message: data?.error ?? 'Opzoeken mislukt.' });
+          setState({ status: 'error', code: data?.error === 'NO_URIS' ? 'NO_URIS' : 'TERM_LOOKUP_FAILED' });
           return;
         }
         setState({ status: 'done', lookups: data.lookups ?? [] });
-      } catch (e) {
-        if (!cancelled) setState({ status: 'error', message: (e as Error).message });
+      } catch {
+        if (!cancelled) setState({ status: 'error', code: 'NETWORK' });
       }
     })();
     return () => {
@@ -52,19 +59,17 @@ export function TermPanel({ uri, onClose }: { uri: string; onClose: () => void }
     <div className="mt-2 block rounded-xl border border-nde-blue/20 bg-nde-blue-soft/50 p-3 text-sm font-normal">
       <div className="mb-1 flex items-center justify-between">
         <span className="text-xs font-semibold uppercase tracking-wide text-nde-blue">
-          Termennetwerk
+          {t('title')}
         </span>
         <button type="button" onClick={onClose} className="text-xs text-nde-muted hover:text-nde-blue">
-          verbergen ✕
+          {t('hide')}
         </button>
       </div>
 
-      {state.status === 'loading' && <p className="text-nde-muted">Bezig met opzoeken…</p>}
-      {state.status === 'error' && <p className="text-nde-orange-dark">{state.message}</p>}
+      {state.status === 'loading' && <p className="text-nde-muted">{t('loading')}</p>}
+      {state.status === 'error' && <p className="text-nde-orange-dark">{te(state.code)}</p>}
       {state.status === 'done' && hits.length === 0 && (
-        <p className="text-nde-muted">
-          Geen informatie gevonden in het Termennetwerk voor deze URI.
-        </p>
+        <p className="text-nde-muted">{t('none')}</p>
       )}
 
       {hits.map((l, i) => (
@@ -72,10 +77,10 @@ export function TermPanel({ uri, onClose }: { uri: string; onClose: () => void }
           <div className="font-semibold text-nde-ink">
             {l.result?.prefLabel?.[0] ?? l.uri}
           </div>
-          {l.source && <div className="text-xs text-nde-muted">Bron: {l.source.name}</div>}
+          {l.source && <div className="text-xs text-nde-muted">{t('source')} {l.source.name}</div>}
           {l.result?.altLabel?.length ? (
             <div className="mt-1 text-xs text-nde-muted">
-              Ook bekend als: {l.result.altLabel.slice(0, 6).join(', ')}
+              {t('alsoKnownAs')} {l.result.altLabel.slice(0, 6).join(', ')}
             </div>
           ) : null}
           {l.result?.definition?.length ? (

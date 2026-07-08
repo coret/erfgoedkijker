@@ -12,7 +12,7 @@ import {
 import { fetchManifestLicense } from '@/lib/iiif';
 import type { SchemaOrgVariant, LicenseCheck } from '@/lib/types';
 import { buildPersistentId, detectScheme } from '@/lib/persistent-id';
-import type { ObjectResponse, GuidanceCode, ValueNode } from '@/lib/types';
+import type { ObjectResponse, GuidanceCode, ValueNode, ApiErrorCode } from '@/lib/types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,10 +36,9 @@ export async function POST(req: NextRequest) {
   }
 
   if (!isHttpUrl(url)) {
-    return NextResponse.json(
-      { ok: false, error: 'Geef een geldige http(s)-permalink op.' },
-      { status: 400 },
-    );
+    // A stable code, not prose: the client owns the interface language.
+    const error: ApiErrorCode = 'INVALID_URL';
+    return NextResponse.json({ ok: false, error }, { status: 400 });
   }
 
   const baseDiagnostics = {
@@ -75,12 +74,7 @@ export async function POST(req: NextRequest) {
       const node: ValueNode = { kind: 'dataset', dataset };
       const field = object.fields.find((f) => f.property === 'isPartOf');
       if (field) field.values = [node];
-      else
-        object.fields.push({
-          property: 'isPartOf',
-          labelNl: 'Onderdeel van dataset',
-          values: [node],
-        });
+      else object.fields.push({ property: 'isPartOf', values: [node] });
     }
 
     // Compare the media license against the IIIF manifest's declared rights/license.

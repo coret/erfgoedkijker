@@ -1,8 +1,13 @@
+'use client';
+
+import { useLocale, useTranslations } from 'next-intl';
 import { getGuidance } from '@/lib/guidance';
 import type { GuidanceCode } from '@/lib/types';
 
 export function Guidance({ code }: { code: GuidanceCode }) {
-  const g = getGuidance(code);
+  const locale = useLocale();
+  const t = useTranslations('guidance');
+  const g = getGuidance(code, locale);
   const error = g.tone === 'error';
   return (
     <div
@@ -27,7 +32,7 @@ export function Guidance({ code }: { code: GuidanceCode }) {
           <h3 className="font-semibold text-nde-ink">{g.title}</h3>
           <p className="text-sm text-nde-muted">{g.body}</p>
           <p className="text-sm text-nde-ink">
-            <span className="font-medium">Suggestie: </span>
+            <span className="font-medium">{t('suggestionLabel')} </span>
             {g.suggestion}
           </p>
           <a

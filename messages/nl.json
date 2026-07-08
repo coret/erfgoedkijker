@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "title": "NDE ErfgoedKijker",
+    "description": "Bekijk een erfgoedobject als linked data volgens SCHEMA-AP-NDE. Een prototype van het Netwerk Digitaal Erfgoed."
+  },
+  "app": {
+    "name": "Digitaal Erfgoed Kijker",
+    "logoAlt": "Netwerk Digitaal Erfgoed"
+  },
+  "lang": {
+    "switchLabel": "Taal",
+    "nl": "Nederlands",
+    "en": "Engels"
+  },
+  "page": {
+    "intro": "Bekijk hoe een erfgoedobject, via linked data op basis van een erfgoedbrede standaard, eruit ziet. Plak een (perma)link van een erfgoedobject en klik op de <b>Bekijken</b> knop of klik op één van de voorbeelden.",
+    "placeholder": "https://… permalink van een erfgoedobject",
+    "inputAria": "Permalink van een erfgoedobject",
+    "submit": "Bekijken",
+    "submitLoading": "Bezig…",
+    "examples": "Voorbeelden:"
+  },
+  "footer": {
+    "body": "Prototype (broncode via <github>Github</github>) dat linked data uit de bron laat zien, het toont uitsluitend velden die het herkent volgens <profile>SCHEMA-AP-NDE (versie 1.1.0)</profile>, termen via het <terms>NDE Termennetwerk</terms> en datasetbeschrijvingen via het <register>NDE Dataset Register</register>."
+  },
+  "errors": {
+    "INVALID_URL": "Geef een geldige http(s)-permalink op.",
+    "NO_URIS": "Geef ten minste één term-URI op.",
+    "TERM_LOOKUP_FAILED": "Opzoeken in het Termennetwerk mislukte.",
+    "NETWORK": "De aanvraag kon niet worden uitgevoerd.",
+    "UNKNOWN": "Er ging iets mis."
+  },
+  "object": {
+    "missingRequired": "Deze verplichte waarde ontbreekt"
+  },
+  "field": {
+    "termFallback": "term",
+    "dataset": "Dataset",
+    "publisher": "Uitgever:",
+    "datasetNoLinkedData": "⚠ Deze dataset-URI leverde geen linked data op.",
+    "datasetRegister": "Bekijk in NDE Dataset Register ↗",
+    "file": "Bestand ↗",
+    "license": "Licentie ↗",
+    "iiifNote": "IIIF-manifest aanwezig — zie de viewer hierboven.",
+    "manifestLink": "manifest ↗"
+  },
+  "diagnostics": {
+    "title": "Controles",
+    "linkedData": "Beschikbaar als linked data",
+    "recognized": "Herkend als SCHEMA-AP-NDE-object",
+    "notRecognized": "Niet herkend",
+    "namespace": "schema.org-namespace",
+    "namespaceHttp": "http (afgeraden)",
+    "namespaceMixed": "http + https",
+    "persistentUri": "Persistente URI",
+    "persistentUriScheme": "Persistente URI ({scheme})",
+    "notPresent": "Niet aangetroffen",
+    "resolves": "Resolvet",
+    "resolvesNot": "Resolvet niet",
+    "missingLangTags": "Tekstwaarden zonder taaltag",
+    "licenseMatch": "Licentie media komt overeen met manifest",
+    "datasetResolves": "Dataset-URI resolvet",
+    "format": "Formaat",
+    "triples": "Triples",
+    "resolvedTo": "Resolved naar",
+    "mediaLicense": "Licentie media",
+    "manifestLicense": "Licentie manifest",
+    "turtleRaw": "Rauwe linked data (Turtle)",
+    "turtleRawFrom": "Rauwe linked data (Turtle, bron was {format})"
+  },
+  "common": {
+    "yes": "Ja",
+    "no": "Nee"
+  },
+  "guidance": {
+    "suggestionLabel": "Suggestie:"
+  },
+  "term": {
+    "title": "Termennetwerk",
+    "hide": "verbergen ✕",
+    "loading": "Bezig met opzoeken…",
+    "none": "Geen informatie gevonden in het Termennetwerk voor deze URI.",
+    "source": "Bron:",
+    "alsoKnownAs": "Ook bekend als:"
+  },
+  "propertyInfo": {
+    "aria": "Uitleg over dit veld"
+  }
+}

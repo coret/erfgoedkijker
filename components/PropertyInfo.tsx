@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 /** Small (i) button that reveals a field explanation in a popover (click to toggle). */
 export function PropertyInfo({ text }: { text: string }) {
+  const t = useTranslations('propertyInfo');
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
 
@@ -28,7 +30,7 @@ export function PropertyInfo({ text }: { text: string }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label="Uitleg over dit veld"
+        aria-label={t('aria')}
         aria-expanded={open}
         className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-nde-line text-[10px] font-semibold italic leading-none text-nde-muted transition hover:border-nde-blue hover:text-nde-blue"
       >

@@ -1,6 +1,6 @@
 // Shimmer skeleton shown in the <article> area while an object is being fetched.
 // Mirrors the layout of ObjectView so the real content replaces it without a jump.
-// Purely decorative (aria-hidden); the "Bezig…" button label is the readable status.
+// Purely decorative (aria-hidden); the submit button's loading label is the readable status.
 
 // Value-column widths per row (fixed, not random) to vary the placeholder rhythm.
 const ROWS = ['w-3/4', 'w-1/2', 'w-2/3', 'w-1/3', 'w-5/6', 'w-1/2'];

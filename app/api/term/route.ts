@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { lookupTerms } from '@/lib/termennetwerk';
+import type { ApiErrorCode } from '@/lib/types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,16 +14,20 @@ export async function POST(req: NextRequest) {
     /* ignore */
   }
 
+  // Errors are stable codes, not prose: the client renders them in the interface language.
   if (uris.length === 0) {
-    return NextResponse.json({ error: 'Geef ten minste één term-URI op.' }, { status: 400 });
+    const error: ApiErrorCode = 'NO_URIS';
+    return NextResponse.json({ error }, { status: 400 });
   }
 
   try {
     const lookups = await lookupTerms(uris);
     return NextResponse.json({ lookups });
   } catch (err) {
+    const error: ApiErrorCode = 'TERM_LOOKUP_FAILED';
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Opzoeken in het Termennetwerk mislukte.' },
+      // `detail` is for debugging only and is never rendered.
+      { error, detail: err instanceof Error ? err.message : undefined },
       { status: 502 },
     );
   }

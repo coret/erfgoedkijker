@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import type { Diagnostics as Diag } from '@/lib/types';
 import { TurtleView } from './TurtleView';
 
@@ -28,20 +31,22 @@ const SOURCE_FORMAT_NAMES: Record<string, string> = {
   'text/n3': 'N3',
 };
 
-/**
- * Label for the raw-Turtle disclosure. The shown Turtle is always serialized from
- * the parsed graph; when the source itself was not Turtle we say so, so it's clear
- * this is a normalized rendering rather than the original bytes.
- */
-function turtleLabel(contentType: string | null): string {
-  const base = (contentType ?? '').split(';')[0].trim().toLowerCase();
-  if (!base || base === 'text/turtle') return 'Rauwe linked data (Turtle)';
-  return `Rauwe linked data (Turtle, bron was ${SOURCE_FORMAT_NAMES[base] ?? base})`;
-}
-
 export function Diagnostics({ diag }: { diag: Diag }) {
+  const t = useTranslations('diagnostics');
+  const tc = useTranslations('common');
   const linkedDataOk = diag.tripleCount > 0;
   const pid = diag.persistentId;
+
+  /**
+   * Label for the raw-Turtle disclosure. The shown Turtle is always serialized from
+   * the parsed graph; when the source itself was not Turtle we say so, so it's clear
+   * this is a normalized rendering rather than the original bytes.
+   */
+  const turtleLabel = (contentType: string | null): string => {
+    const base = (contentType ?? '').split(';')[0].trim().toLowerCase();
+    if (!base || base === 'text/turtle') return t('turtleRaw');
+    return t('turtleRawFrom', { format: SOURCE_FORMAT_NAMES[base] ?? base });
+  };
 
   // Number of "orange" (ok===false) checks below; grey/null checks don't count.
   const orangeCount =
@@ -59,7 +64,7 @@ export function Diagnostics({ diag }: { diag: Diag }) {
         <summary className="flex cursor-pointer list-none items-center justify-between [&::-webkit-details-marker]:hidden">
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-nde-muted">
-              Controles
+              {t('title')}
             </h2>
             {orangeCount > 0 && (
               <span className="rounded-full bg-nde-orange/15 px-2 py-0.5 text-xs font-semibold text-nde-orange-dark">
@@ -73,31 +78,31 @@ export function Diagnostics({ diag }: { diag: Diag }) {
         </summary>
         <dl className="mt-3 space-y-3 text-sm">
         <div className="flex items-center justify-between gap-3">
-          <dt className="text-nde-ink">Beschikbaar als linked data</dt>
+          <dt className="text-nde-ink">{t('linkedData')}</dt>
           <dd>
-            <Badge ok={linkedDataOk}>{linkedDataOk ? 'Ja' : 'Nee'}</Badge>
+            <Badge ok={linkedDataOk}>{linkedDataOk ? tc('yes') : tc('no')}</Badge>
           </dd>
         </div>
 
         <div className="flex items-center justify-between gap-3">
-          <dt className="text-nde-ink">Herkend als SCHEMA-AP-NDE-object</dt>
+          <dt className="text-nde-ink">{t('recognized')}</dt>
           <dd>
             <Badge ok={diag.foundCreativeWork}>
-              {diag.foundCreativeWork ? 'CreativeWork' : 'Niet herkend'}
+              {diag.foundCreativeWork ? 'CreativeWork' : t('notRecognized')}
             </Badge>
           </dd>
         </div>
 
         {diag.schemaOrg !== null && (
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-nde-ink">schema.org-namespace</dt>
+            <dt className="text-nde-ink">{t('namespace')}</dt>
             <dd>
               <Badge ok={diag.schemaOrg === 'https'}>
                 {diag.schemaOrg === 'https'
                   ? 'https'
                   : diag.schemaOrg === 'http'
-                    ? 'http (afgeraden)'
-                    : 'http + https'}
+                    ? t('namespaceHttp')
+                    : t('namespaceMixed')}
               </Badge>
             </dd>
           </div>
@@ -105,20 +110,20 @@ export function Diagnostics({ diag }: { diag: Diag }) {
 
         <div className="flex items-center justify-between gap-3">
           <dt className="text-nde-ink">
-            Persistente URI{pid.scheme ? ` (${pid.scheme})` : ''}
+            {pid.scheme ? t('persistentUriScheme', { scheme: pid.scheme }) : t('persistentUri')}
           </dt>
           <dd>
             {pid.scheme === null ? (
-              <Badge ok={null}>Niet aangetroffen</Badge>
+              <Badge ok={null}>{t('notPresent')}</Badge>
             ) : (
-              <Badge ok={pid.ok}>{pid.ok ? 'Resolvet' : 'Resolvet niet'}</Badge>
+              <Badge ok={pid.ok}>{pid.ok ? t('resolves') : t('resolvesNot')}</Badge>
             )}
           </dd>
         </div>
 
         {diag.missingLanguageTags !== null && (
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-nde-ink">Tekstwaarden zonder taaltag</dt>
+            <dt className="text-nde-ink">{t('missingLangTags')}</dt>
             <dd>
               <Badge ok={diag.missingLanguageTags === 0}>{diag.missingLanguageTags}</Badge>
             </dd>
@@ -127,10 +132,10 @@ export function Diagnostics({ diag }: { diag: Diag }) {
 
         {diag.licenseCheck && (
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-nde-ink">Licentie media komt overeen met manifest</dt>
+            <dt className="text-nde-ink">{t('licenseMatch')}</dt>
             <dd>
               <Badge ok={diag.licenseCheck.match}>
-                {diag.licenseCheck.match ? 'Ja' : 'Nee'}
+                {diag.licenseCheck.match ? tc('yes') : tc('no')}
               </Badge>
             </dd>
           </div>
@@ -138,10 +143,10 @@ export function Diagnostics({ diag }: { diag: Diag }) {
 
         {diag.datasetResolves !== null && (
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-nde-ink">Dataset-URI resolvet</dt>
+            <dt className="text-nde-ink">{t('datasetResolves')}</dt>
             <dd>
               <Badge ok={diag.datasetResolves}>
-                {diag.datasetResolves ? 'Ja' : 'Nee'}
+                {diag.datasetResolves ? tc('yes') : tc('no')}
               </Badge>
             </dd>
           </div>
@@ -150,22 +155,22 @@ export function Diagnostics({ diag }: { diag: Diag }) {
         <div className="mt-3 space-y-1 border-t border-nde-line pt-3 text-xs text-nde-muted">
           {diag.detectedFormat && (
             <div>
-              Formaat: <span className="font-mono">{diag.detectedFormat}</span>
+              {t('format')}: <span className="font-mono">{diag.detectedFormat}</span>
             </div>
           )}
-          {diag.tripleCount > 0 && <div>Triples: {diag.tripleCount}</div>}
+          {diag.tripleCount > 0 && <div>{t('triples')}: {diag.tripleCount}</div>}
           {diag.finalUrl && diag.finalUrl !== diag.inputUrl && (
             <div className="break-all">
-              Resolved naar: <span className="font-mono">{diag.finalUrl}</span>
+              {t('resolvedTo')}: <span className="font-mono">{diag.finalUrl}</span>
             </div>
           )}
           {diag.licenseCheck && !diag.licenseCheck.match && (
             <>
               <div className="break-all">
-                Licentie media: <span className="font-mono">{diag.licenseCheck.media}</span>
+                {t('mediaLicense')}: <span className="font-mono">{diag.licenseCheck.media}</span>
               </div>
               <div className="break-all">
-                Licentie manifest: <span className="font-mono">{diag.licenseCheck.manifest}</span>
+                {t('manifestLicense')}: <span className="font-mono">{diag.licenseCheck.manifest}</span>
               </div>
             </>
           )}

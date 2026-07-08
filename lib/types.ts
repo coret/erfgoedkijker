@@ -56,10 +56,13 @@ export type ValueNode =
   | { kind: 'dataset'; dataset: DatasetInfo }
   | { kind: 'iiif'; manifestUrl: string };
 
+// No display labels travel over the wire: the client resolves them from `property` and
+// `type` via `lib/schema-ap-nde.ts` in the current interface language, so switching
+// language never needs to refetch the object.
+
 export type Field = {
   /** schema.org property local name, e.g. "creator". */
   property: string;
-  labelNl: string;
   values: ValueNode[];
 };
 
@@ -67,7 +70,6 @@ export type MappedResource = {
   uri?: string;
   /** schema.org class local name, e.g. "Person". */
   type: string;
-  typeLabelNl: string;
   fields: Field[];
 };
 
@@ -75,13 +77,15 @@ export type ObjectView = {
   uri: string;
   /** schema.org class local name of the main object (usually CreativeWork). */
   type: string;
-  typeLabelNl: string;
   fields: Field[];
   /** Convenience: does this object expose an IIIF manifest? */
   iiifManifestUrl?: string;
   /** Convenience: count of DefinedTerm values anywhere in the tree. */
   termCount: number;
 };
+
+/** Stable error codes returned by the API routes; the client translates them. */
+export type ApiErrorCode = 'INVALID_URL' | 'NO_URIS' | 'TERM_LOOKUP_FAILED';
 
 export type GuidanceCode =
   | 'URL_UNRESOLVED'
@@ -123,6 +127,7 @@ export type ObjectResponse = {
   ok: boolean;
   /** Set when no object view could be produced at all (URL/linked-data level). */
   fatal?: GuidanceCode;
+  /** Debug only, never rendered: the raw upstream error. Users see `fatal`'s guidance. */
   message?: string;
   object?: ObjectView;
   diagnostics: Diagnostics;

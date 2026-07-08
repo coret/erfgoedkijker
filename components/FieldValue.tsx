@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import type { ValueNode, LangLiteral, DefinedTermValue, DatasetInfo } from '@/lib/types';
+import { useLocale, useTranslations } from 'next-intl';
+import type { ValueNode, DefinedTermValue, DatasetInfo, MediaValue } from '@/lib/types';
+import { classLabel, propertyLabel } from '@/lib/schema-ap-nde';
+import { pickLiteral, selectValues } from '@/lib/i18n';
 import { TermPanel } from './TermPanel';
 
 function LangBadge({ lang }: { lang?: string }) {
@@ -22,25 +25,19 @@ function TypeBadge({ type }: { type: string }) {
   );
 }
 
-function pickLiteral(lits: LangLiteral[]): LangLiteral | undefined {
-  return (
-    lits.find((l) => l.lang === 'nl') ??
-    lits.find((l) => l.lang === 'en') ??
-    lits[0]
-  );
-}
-
 function TermValue({ term }: { term: DefinedTermValue }) {
   const [open, setOpen] = useState(false);
-  const label = pickLiteral(term.name);
-  const text = label?.value ?? term.sameAs ?? 'term';
+  const locale = useLocale();
+  const t = useTranslations('field');
+  const label = pickLiteral(term.name, locale);
+  const text = label?.value ?? term.sameAs ?? t('termFallback');
 
   if (!term.sameAs) {
     return (
       <span>
         {text}
         <LangBadge lang={label?.lang} />
-        {term.types?.map((t) => <TypeBadge key={t} type={t} />)}
+        {term.types?.map((ty) => <TypeBadge key={ty} type={ty} />)}
       </span>
     );
   }
@@ -55,21 +52,23 @@ function TermValue({ term }: { term: DefinedTermValue }) {
         {text}
       </button>
       <LangBadge lang={label?.lang} />
-      {term.types?.map((t) => <TypeBadge key={t} type={t} />)}
+      {term.types?.map((ty) => <TypeBadge key={ty} type={ty} />)}
       {open && <TermPanel uri={term.sameAs} onClose={() => setOpen(false)} />}
     </span>
   );
 }
 
 function DatasetValue({ dataset }: { dataset: DatasetInfo }) {
-  const title = dataset.name ? pickLiteral(dataset.name) : undefined;
-  const description = dataset.description ? pickLiteral(dataset.description) : undefined;
-  const publisher = dataset.publisher ? pickLiteral(dataset.publisher) : undefined;
+  const locale = useLocale();
+  const t = useTranslations('field');
+  const title = dataset.name ? pickLiteral(dataset.name, locale) : undefined;
+  const description = dataset.description ? pickLiteral(dataset.description, locale) : undefined;
+  const publisher = dataset.publisher ? pickLiteral(dataset.publisher, locale) : undefined;
 
   return (
     <div className="rounded-xl border border-nde-line bg-nde-bg/60 p-3">
       <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-nde-muted">
-        Dataset
+        {t('dataset')}
       </div>
       {title && (
         <div className="font-semibold text-nde-ink">
@@ -85,13 +84,11 @@ function DatasetValue({ dataset }: { dataset: DatasetInfo }) {
       )}
       {publisher && (
         <div className="mt-1 text-sm text-nde-muted">
-          Uitgever: <span className="text-nde-ink">{publisher.value}</span>
+          {t('publisher')} <span className="text-nde-ink">{publisher.value}</span>
         </div>
       )}
       {!dataset.resolved && (
-        <p className="mt-1 text-xs text-nde-orange-dark">
-          ⚠ Deze dataset-URI leverde geen linked data op.
-        </p>
+        <p className="mt-1 text-xs text-nde-orange-dark">{t('datasetNoLinkedData')}</p>
       )}
       <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
         <a
@@ -108,10 +105,96 @@ function DatasetValue({ dataset }: { dataset: DatasetInfo }) {
           rel="noreferrer"
           className="whitespace-nowrap text-nde-blue hover:underline"
         >
-          Bekijk in NDE Dataset Register ↗
+          {t('datasetRegister')}
         </a>
       </div>
     </div>
+  );
+}
+
+function MediaObjectValue({ media }: { media: MediaValue }) {
+  const locale = useLocale();
+  const t = useTranslations('field');
+  // copyrightNotice is single-cardinality prose, so several values are translations:
+  // pick one, rather than stacking them.
+  const copyright = media.copyrightNotice ? pickLiteral(media.copyrightNotice, locale) : undefined;
+
+  return (
+    <div className="space-y-1">
+      {(media.thumbnailUrl || media.contentUrl) && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={media.thumbnailUrl || media.contentUrl}
+          alt=""
+          className="max-h-48 rounded-lg border border-nde-line"
+        />
+      )}
+      <div className="space-x-3 text-xs text-nde-muted">
+        {media.contentUrl && (
+          <a href={media.contentUrl} target="_blank" rel="noreferrer" className="text-nde-blue hover:underline">
+            {t('file')}
+          </a>
+        )}
+        {media.license && (
+          <a href={media.license} target="_blank" rel="noreferrer" className="text-nde-blue hover:underline">
+            {t('license')}
+          </a>
+        )}
+      </div>
+      {copyright && (
+        <p className="text-xs text-nde-muted">
+          © {copyright.value}
+          <LangBadge lang={copyright.lang} />
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ResourceValue({ resource }: { resource: Extract<ValueNode, { kind: 'resource' }>['resource'] }) {
+  const locale = useLocale();
+  return (
+    <div className="rounded-xl border border-nde-line bg-nde-bg/60 p-3">
+      <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-nde-muted">
+        {classLabel(resource.type, locale)}
+      </div>
+      <dl className="space-y-1.5">
+        {resource.fields.map((f) => (
+          <div key={f.property} className="grid grid-cols-[8rem_1fr] gap-2 text-sm">
+            <dt className="text-nde-muted">{propertyLabel(resource.type, f.property, locale)}</dt>
+            <dd className="space-y-1">
+              {selectValues(f.values, locale, f.property).map((v, i) => (
+                <div key={i}>
+                  <FieldValue value={v} />
+                </div>
+              ))}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      {resource.uri && (
+        <a
+          href={resource.uri}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 inline-block break-all text-xs text-nde-muted hover:text-nde-blue hover:underline"
+        >
+          {resource.uri}
+        </a>
+      )}
+    </div>
+  );
+}
+
+function IiifValue({ manifestUrl }: { manifestUrl: string }) {
+  const t = useTranslations('field');
+  return (
+    <span className="text-sm text-nde-muted">
+      {t('iiifNote')}{' '}
+      <a href={manifestUrl} target="_blank" rel="noreferrer" className="text-nde-blue hover:underline">
+        {t('manifestLink')}
+      </a>
+    </span>
   );
 }
 
@@ -153,71 +236,11 @@ export function FieldValue({ value }: { value: ValueNode }) {
         </a>
       );
     case 'media':
-      return (
-        <div className="space-y-1">
-          {(value.media.thumbnailUrl || value.media.contentUrl) && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={value.media.thumbnailUrl || value.media.contentUrl}
-              alt=""
-              className="max-h-48 rounded-lg border border-nde-line"
-            />
-          )}
-          <div className="space-x-3 text-xs text-nde-muted">
-            {value.media.contentUrl && (
-              <a href={value.media.contentUrl} target="_blank" rel="noreferrer" className="text-nde-blue hover:underline">
-                Bestand ↗
-              </a>
-            )}
-            {value.media.license && (
-              <a href={value.media.license} target="_blank" rel="noreferrer" className="text-nde-blue hover:underline">
-                Licentie ↗
-              </a>
-            )}
-          </div>
-        </div>
-      );
+      return <MediaObjectValue media={value.media} />;
     case 'iiif':
-      return (
-        <span className="text-sm text-nde-muted">
-          IIIF-manifest aanwezig — zie de viewer hierboven.{' '}
-          <a href={value.manifestUrl} target="_blank" rel="noreferrer" className="text-nde-blue hover:underline">
-            manifest ↗
-          </a>
-        </span>
-      );
+      return <IiifValue manifestUrl={value.manifestUrl} />;
     case 'resource':
-      return (
-        <div className="rounded-xl border border-nde-line bg-nde-bg/60 p-3">
-          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-nde-muted">
-            {value.resource.typeLabelNl}
-          </div>
-          <dl className="space-y-1.5">
-            {value.resource.fields.map((f) => (
-              <div key={f.property} className="grid grid-cols-[8rem_1fr] gap-2 text-sm">
-                <dt className="text-nde-muted">{f.labelNl}</dt>
-                <dd className="space-y-1">
-                  {f.values.map((v, i) => (
-                    <div key={i}>
-                      <FieldValue value={v} />
-                    </div>
-                  ))}
-                </dd>
-              </div>
-            ))}
-          </dl>
-          {value.resource.uri && (
-            <a
-              href={value.resource.uri}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-2 inline-block break-all text-xs text-nde-muted hover:text-nde-blue hover:underline"
-            >
-              {value.resource.uri}
-            </a>
-          )}
-        </div>
-      );
+      return <ResourceValue resource={value.resource} />;
     default:
       return null;
   }
