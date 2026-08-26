@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Digital Heritage Viewer",
-    "description": "View a heritage object as linked data according to SCHEMA-AP-NDE. A prototype of the Dutch Digital Heritage Network."
+    "description": "Prototype for checking whether a heritage object is correctly published as linked data according to SCHEMA-AP-NDE, and what that data looks like."
   },
   "app": {
     "name": "Digital Heritage Viewer",
