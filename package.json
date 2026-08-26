@@ -2,7 +2,7 @@
   "name": "erfgoedkijker",
   "version": "0.1.0",
   "private": true,
-  "description": "NDE ErfgoedKijker — bekijk een erfgoedobject als linked data volgens SCHEMA-AP-NDE",
+  "description": "Digitaal Erfgoed Kijker — bekijk een erfgoedobject als linked data volgens SCHEMA-AP-NDE",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
