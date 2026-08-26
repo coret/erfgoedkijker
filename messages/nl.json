@@ -1,11 +1,11 @@
 {
   "meta": {
-    "title": "NDE ErfgoedKijker",
+    "title": "Digitaal Erfgoed Kijker",
     "description": "Bekijk een erfgoedobject als linked data volgens SCHEMA-AP-NDE. Een prototype van het Netwerk Digitaal Erfgoed."
   },
   "app": {
     "name": "Digitaal Erfgoed Kijker",
-    "logoAlt": "Netwerk Digitaal Erfgoed"
+    "logoAlt": "Bob Coret"
   },
   "lang": {
     "switchLabel": "Taal",

@@ -1,11 +1,11 @@
 {
   "meta": {
-    "title": "NDE Heritage Viewer",
+    "title": "Digital Heritage Viewer",
     "description": "View a heritage object as linked data according to SCHEMA-AP-NDE. A prototype of the Dutch Digital Heritage Network."
   },
   "app": {
     "name": "Digital Heritage Viewer",
-    "logoAlt": "Dutch Digital Heritage Network"
+    "logoAlt": "Bob Coret"
   },
   "lang": {
     "switchLabel": "Language",

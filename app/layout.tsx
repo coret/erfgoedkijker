@@ -9,7 +9,16 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t('title'),
     description: t('description'),
-    icons: { icon: '/nde-logo.svg' },
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
+        { url: '/favicon-16x16.png', type: 'image/png', sizes: '16x16' },
+      ],
+      apple: { url: '/apple-touch-icon.png', sizes: '180x180' },
+      other: { rel: 'mask-icon', url: '/safari-pinned-tab.svg', color: '#4472c4' },
+    },
+    manifest: '/site.webmanifest',
   };
 }
 
@@ -43,7 +52,7 @@ export default async function RootLayout({
             <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-10">
               <a href="/" className="flex items-center gap-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/nde-logo.svg" alt={t('app.logoAlt')} className="h-10 w-auto" />
+                <img src="/bc-logo.png" alt={t('app.logoAlt')} className="h-10 w-auto" />
                 <span className="text-3xl font-bold tracking-tight text-nde-ink">
                   {t('app.name')}
                 </span>

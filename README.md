@@ -1,4 +1,4 @@
-# NDE ErfgoedKijker
+# Digitaal Erfgoed Kijker
 
 Een prototype waarmee een applicatiebeheerder bij een erfgoedinstelling of een
 datacleaner uit een NDE-datawerkplaats snel kan controleren of een **erfgoedobject**
