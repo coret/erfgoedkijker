@@ -130,16 +130,15 @@ docker run -d --name erfgoedkijker \
   -e PORT=3003 \
   -p 3003:3003 \
   --restart unless-stopped \
-  --health-cmd 'wget -qO- http://127.0.0.1:3003/api/health || exit 1' \
-  --health-interval 30s \
   erfgoedkijker:latest
 # http://localhost:3003
 ```
 
-> De health-check gebruikt **`127.0.0.1`**, niet `localhost`: in de Alpine-container
-> resolvet `localhost` eerst naar `::1`, terwijl de Node-server alleen op IPv4 luistert
-> (`HOSTNAME=0.0.0.0`). Met `localhost` blijft de container daardoor eeuwig `unhealthy`
-> terwijl hij prima draait.
+> De health-check zit in de `HEALTHCHECK` van de Dockerfile, dus je hoeft hem niet op de
+> `docker run`-regel mee te geven — hij overleeft elke redeploy. Hij gebruikt
+> **`127.0.0.1`**, niet `localhost`: in de Alpine-container resolvet `localhost` eerst
+> naar `::1`, terwijl de Node-server alleen op IPv4 luistert (`HOSTNAME=0.0.0.0`). Met
+> `localhost` blijft de container daardoor eeuwig `unhealthy` terwijl hij prima draait.
 
 Beheren:
 
